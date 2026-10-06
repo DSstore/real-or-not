@@ -11,6 +11,7 @@ from uuid import UUID
 PROTOCOL_VERSION = 1
 MAX_DATAGRAM_BYTES = 1200
 MAX_WIRE_INTEGER = 2**63 - 1
+MAX_SLOTS = 2  # Players that can share one camera.
 GESTURES = frozenset({"OPEN_HAND", "FIST", "PINCH", "POINT", "UNKNOWN"})
 
 
@@ -54,8 +55,13 @@ class CVState:
     gesture: str
     confidence: float
     mirrored: bool
+    # Which player this stream belongs to when two people share one camera (0 or 1). None for the original
+    # single-player stream, which then leaves the field out of the packet entirely.
+    slot: int | None = None
 
     def __post_init__(self) -> None:
+        if self.slot is not None and (type(self.slot) is not int or not 0 <= self.slot < MAX_SLOTS):
+            raise ProtocolError(f"slot must be omitted or a whole number from 0 to {MAX_SLOTS - 1}.")
         try:
             valid_id = isinstance(self.stream_id, str) and str(UUID(self.stream_id)) == self.stream_id
         except ValueError:
@@ -84,6 +90,8 @@ class CVState:
     def to_bytes(self) -> bytes:
         """Serialize one complete UTF-8 JSON object with finite numeric values."""
         data = {"type": "CV_STATE", "version": PROTOCOL_VERSION, **asdict(self)}
+        if self.slot is None:
+            del data["slot"]
         payload = json.dumps(data, separators=(",", ":"), allow_nan=False).encode("utf-8")
         if len(payload) > MAX_DATAGRAM_BYTES:
             raise ProtocolError("CV_STATE exceeds the datagram size limit.")
@@ -125,6 +133,7 @@ def decode_cv_state(payload: bytes) -> CVState:
             stream_id=data["stream_id"], sequence=data["sequence"], timestamp=data["timestamp"],
             hand=data["hand"], tracking=data["tracking"], position=position,
             gesture=data["gesture"], confidence=data["confidence"], mirrored=data["mirrored"],
+            slot=data.get("slot"),
         )
     except (ValueError, TypeError, KeyError, UnicodeError, OverflowError, RecursionError) as error:
         raise ProtocolError("Invalid CV_STATE packet; see docs/udp_protocol.md.") from error

@@ -38,6 +38,7 @@ The Python programs read every key except `UNITY_RECEIVE_TIMEOUT`. The Unity pro
 | `TRACKING_MODEL_COMPLEXITY` | `1` | 0 or 1 | `0` is the lighter model: about twice as fast (29 against 17 FPS headless on the test machine) with similar stability. `1` is the full model. |
 | `TRACKING_DETECTION_CONFIDENCE` | `0.6` | 0 to 1 | MediaPipe's threshold for detecting a new hand. |
 | `TRACKING_MIN_CONFIDENCE` | `0.6` | 0 to 1 | MediaPipe's threshold for continuing to track a hand. |
+| `TRACKING_PLAYERS` | `1` | 1 or 2 | `1` is the original one-player behaviour. `2` lets two people share the camera: the left half of the picture is player 1 and the right half is player 2, each with their own hand, smoothing, gestures and `CV_STATE` packets (a `slot` field, `0` or `1`). In this mode the engine looks for up to 4 hands so that a spare hand cannot hide a player's hand, keeps the most confident hand in each half, and does not use the label-flicker fix. `CONTROL_HAND` is ignored. |
 
 ## Palm control filtering
 
@@ -51,6 +52,8 @@ Coordinates here are normalized image coordinates (0 to 1).
 | `CONTROL_TRACKING_TIMEOUT` | `0.5` | above 0 (seconds) | Gap after which filter history is discarded. |
 | `CONTROL_CONTINUITY_SECONDS` | `0.3` | 0 to 1 (seconds) | A hand detected where a tracked hand was this recently keeps that hand's label even if MediaPipe flips it or reports low confidence. `0` turns the correction off. See [Phase 3](phase3_coordinates.md). |
 | `CONTROL_CONTINUITY_RADIUS` | `0.25` | above 0, up to 1 | Largest palm movement between frames still treated as the same hand. |
+| `CONTROL_ZONE_HYSTERESIS` | `0.04` | 0 to 0.25 | Two players only. A hand this close to the line between the two halves (as a share of the picture width) stays with the player whose hand was just there, so it does not flip players at the line. `0` turns it off. |
+| `CONTROL_ZONE_EDGE_TRIM` | `0.15` | 0 up to, not including, 0.5 | Two players only. The share of each half's width, at each edge, that a hand does not have to reach. The middle part is stretched to the full cursor range, because people move their hands over a small range (measured in the two-person test: about 17% of the picture width when waving). |
 | `CONTROL_HAND` | `right` | `left`, `right` | The physical hand that controls the cursor. It never switches on its own. |
 
 ## Gesture rules

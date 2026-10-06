@@ -132,6 +132,8 @@ class ConfigurationReferenceTests(unittest.TestCase):
             "CONTROL_TRACKING_TIMEOUT": s.control.tracking_timeout,
             "CONTROL_CONTINUITY_SECONDS": s.control.continuity_seconds,
             "CONTROL_CONTINUITY_RADIUS": s.control.continuity_radius, "CONTROL_HAND": s.sender.hand,
+            "TRACKING_PLAYERS": s.tracking.players, "CONTROL_ZONE_HYSTERESIS": s.control.zone_hysteresis,
+            "CONTROL_ZONE_EDGE_TRIM": s.control.zone_edge_trim,
             "GESTURE_DEBOUNCE_FRAMES": s.gestures.debounce_frames, "GESTURE_PINCH_RATIO": s.gestures.pinch_ratio,
             "GESTURE_EXTENDED_ANGLE": s.gestures.extended_angle, "GESTURE_CURLED_ANGLE": s.gestures.curled_angle,
             "GESTURE_REACH_RATIO": s.gestures.reach_ratio, "UDP_HOST": s.udp_host,

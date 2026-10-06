@@ -60,8 +60,9 @@ Python's filtering timeout cannot protect a receiver when Python stops sending.
 | `gesture` | string | Debounced `OPEN_HAND`, `FIST`, `PINCH`, `POINT`, or `UNKNOWN` |
 | `confidence` | number | Finite [0,1] handedness classification confidence |
 | `mirrored` | boolean | Whether Python mirrored the input before inference |
+| `slot` | integer, optional | Two-player mode only (`TRACKING_PLAYERS=2`): the player, `0` (left half of the picture) or `1` (right half). Left out of the packet entirely in one-player mode |
 
-All fields are required. X increases to the image right, Y increases downward.
+All fields except `slot` are required. X increases to the image right, Y increases downward.
 Z is wrist-relative MediaPipe model depth, not meters. Confidence is confidence
 in the left/right label, not landmark accuracy. Native landmarks and raw gesture
 candidates are excluded. A usable palm with unusable gesture geometry still
@@ -71,6 +72,17 @@ With `mirrored=true`, Python has already mirrored the coordinates; the default U
 uses X directly. Unity converts Y downward to its own coordinate system.
 Phase 7 inverts X when the packet mirror flag differs from the desired Mirror
 Control setting, providing mirror-like control even for an unmirrored packet. Labels always refer to the physical hand.
+
+### Two players on one camera
+
+With `TRACKING_PLAYERS=2` the engine sends **two independent streams to the same port**, one per player. Each has its
+own `stream_id` and `sequence` counter and carries `slot` 0 or 1, so a receiver keeps one buffer per `slot` and applies
+the rules above to each separately. Hands are matched to players by where they are in the (mirrored) picture, not by
+MediaPipe's left/right label, so two people can both show a right hand. In this mode `hand` is only the name of the
+player's zone (`left` for slot 0, `right` for slot 1) and says nothing about which hand the person used, and `x` is
+stretched so the middle of the player's half covers the whole 0 to 1 range (see `CONTROL_ZONE_EDGE_TRIM`). The Unity
+build from Phase 6 keeps a single buffer and accepts only one `stream_id` at a time, so it cannot be used with two
+players; it needs a per-`slot` receiver.
 
 Only the selected hand controls this stream. There is no automatic fallback to
 the other hand, even when both are tracked. Separate filter/gesture states remain

@@ -4,6 +4,8 @@ What changed, by phase, with the date of each commit. Entries describe behaviour
 
 ## Unreleased
 
+- **Scam quiz: question bank.** 60 original questions from senior-tagged Digital for Life pages (12 per difficulty, 17 topics, each citing its source), a validator (`tools/validate_questions.py`) and a random round picker (`shared/questions.py`).
+- **Scam quiz: two players on one camera (Python side).** `TRACKING_PLAYERS=2` matches hands to players by screen zone (left half, right half) instead of by MediaPipe's left/right label, so two people can both show a right hand. Each player gets their own smoothing, gestures and `CV_STATE` stream (new optional `slot` field); each half's middle is stretched to the full cursor range. One-player behaviour and packets are unchanged. The Unity side is not built yet.
 - **Phase 20: portfolio polish.** Generated screenshots and sample report from invented demo data (`tools/make_demo_assets.py`); performance charts and a performance write-up; a retrospective of challenges and lessons; a guide to recording the demo; a CI workflow; README gallery and highlights.
 
 ## Documentation, setup and quality (2026-10-06)

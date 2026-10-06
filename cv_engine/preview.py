@@ -34,10 +34,19 @@ def draw_overlay(
     frame: VideoFrame, result: TrackingResult, loop_fps: float,
     controls: ControlResult | None = None,
     gestures: GestureResult | None = None,
+    zones: int = 1,
 ) -> VideoFrame:
-    """Draw raw landmarks on a copy, leaving the captured frame untouched."""
+    """Draw raw landmarks on a copy, leaving the captured frame untouched.
+
+    With ``zones`` of 2 or more, the lines between the players' zones and each player's name are drawn too."""
     canvas = frame.copy()
     height, width = canvas.shape[:2]
+    for zone in range(zones if zones > 1 else 0):
+        if zone:
+            line_x = round(zone * (width - 1) / zones)
+            cv2.line(canvas, (line_x, 0), (line_x, height - 1), (200, 200, 200), 1, cv2.LINE_AA)
+        cv2.putText(canvas, f"Player {zone + 1}", (round((zone + 0.5) * width / zones) - 30, height - 12),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2, cv2.LINE_AA)
     for hand in result.hands:
         if len(hand.landmarks) != 21 or not all(
             math.isfinite(value) for p in hand.landmarks for value in (p.x, p.y, p.z)
@@ -102,10 +111,11 @@ class Preview:
         self, frame: VideoFrame, result: TrackingResult, loop_fps: float,
         controls: ControlResult | None = None,
         gestures: GestureResult | None = None,
+        zones: int = 1,
     ) -> bool:
         """Return false when Q, Escape, or window close requests a clean stop."""
         try:
-            cv2.imshow(WINDOW_NAME, draw_overlay(frame, result, loop_fps, controls, gestures))
+            cv2.imshow(WINDOW_NAME, draw_overlay(frame, result, loop_fps, controls, gestures, zones))
             key = cv2.waitKey(1) & 0xFF
             if key in (ord("q"), ord("Q"), 27):
                 return False

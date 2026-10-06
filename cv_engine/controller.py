@@ -6,6 +6,7 @@ import argparse
 import logging
 import sys
 from contextlib import ExitStack
+from dataclasses import replace
 from time import perf_counter
 
 from shared.config import ConfigurationError, Settings, load_settings
@@ -34,27 +35,41 @@ def run_tracking(
     from cv_engine.position_processor import PositionProcessor
     from cv_engine.preview import Preview
     from cv_engine.udp_sender import UdpSender
+    from cv_engine.zones import DETECTION_LIMIT, ZONE_LABELS, ZoneAssigner
 
     if max_frames is not None and max_frames < 1:
         raise ValueError("max_frames must be positive.")
+    players = settings.tracking.players
+    # Two players: match hands to people by screen zone and send one stream per player. One player: unchanged.
+    zones = ZoneAssigner(players, settings.control) if players > 1 else None
+    tracking_settings = settings.tracking if zones is None else replace(
+        settings.tracking, max_hands=max(settings.tracking.max_hands, DETECTION_LIMIT))
     with ExitStack() as stack:
         # Check the optional desktop preview before accessing the camera.
         preview = stack.enter_context(Preview()) if show_preview else None
         camera = stack.enter_context(Camera(settings.camera))
-        tracker = stack.enter_context(HandTracker(settings.tracking, settings.camera.mirror))
-        sender = stack.enter_context(UdpSender(
-            settings.udp_host, settings.cv_to_unity_port, settings.sender, settings.camera.mirror,
-        )) if send_udp else None
+        tracker = stack.enter_context(HandTracker(tracking_settings, settings.camera.mirror))
+        senders = []
+        if send_udp:
+            for slot in range(players if zones is not None else 1):
+                sender_settings = settings.sender if zones is None else replace(settings.sender, hand=ZONE_LABELS[slot])
+                senders.append(stack.enter_context(UdpSender(
+                    settings.udp_host, settings.cv_to_unity_port, sender_settings, settings.camera.mirror,
+                    slot=slot if zones is not None else None,
+                )))
         continuity = LabelContinuity(settings.control)
         processor = PositionProcessor(settings.control)
         gesture_processor = GestureProcessor(settings.gestures, settings.control)
         LOGGER.info("Tracking started. Frames stay local; UDP numerical states %s.",
-                    "enabled" if sender is not None else "disabled")
+                    "enabled" if senders else "disabled")
         LOGGER.info("Settings: camera %d requested %dx%d mirror=%s; model complexity %d; max hands %d; "
                     "control hand %s; label continuity %.2f s within %.2f.", settings.camera.index,
                     settings.camera.width, settings.camera.height, settings.camera.mirror,
-                    settings.tracking.model_complexity, settings.tracking.max_hands, settings.sender.hand,
+                    settings.tracking.model_complexity, tracking_settings.max_hands, settings.sender.hand,
                     settings.control.continuity_seconds, settings.control.continuity_radius)
+        if zones is not None:
+            LOGGER.info("Two players: player 1 is the left half of the picture, player 2 the right half. Hands are "
+                        "matched by zone, not by left/right label; the label-continuity fix is not used.")
         if preview is None:
             LOGGER.info("No preview window: press Q or Esc in this console (or Ctrl+C) to stop.")
         started_at = last_report_at = perf_counter()
@@ -69,11 +84,13 @@ def run_tracking(
                 result = tracker.process(frame)
                 frame_count += 1
                 now = perf_counter()
-                result = continuity.apply(result, now)
+                result = continuity.apply(result, now) if zones is None else zones.assign(result, now)
                 controls = processor.update(result, now)
                 gestures = gesture_processor.update(result, controls, now, frame.shape[1] / frame.shape[0])
-                if sender is not None:
-                    sender.send(controls, gestures, now)
+                # Each stream picks its own player's hand out of the same controls (see UdpSender).
+                outgoing = controls if zones is None else zones.output_controls(controls)
+                for sender in senders:
+                    sender.send(outgoing, gestures, now)
                 loop_fps = frame_count / max(now - started_at, 1e-9)
                 if controls.tracking != previous_tracking:
                     LOGGER.info("Hand tracking restored." if controls.tracking else "Hand tracking lost.")
@@ -82,12 +99,15 @@ def run_tracking(
                 if now - last_report_at >= 5:
                     LOGGER.info("Loop FPS %.1f; latest MediaPipe processing %.1f ms; label corrections so far: %d.",
                                 loop_fps, result.processing_ms, continuity.corrections)
-                    if sender is not None:
-                        LOGGER.info("UDP totals: %d accepted, %d failed, %d frames skipped; delivery unconfirmed.",
+                    for sender in senders:
+                        LOGGER.info("UDP totals%s: %d accepted, %d failed, %d frames skipped; delivery unconfirmed.",
+                                    "" if sender.slot is None else f" (player {sender.slot + 1})",
                                     sender.sent, sender.failed, sender.skipped)
                     last_report_at = now
-                if preview is not None and not preview.show(frame, result, loop_fps, controls, gestures):
-                    break
+                if preview is not None:
+                    extra = {} if zones is None else {"zones": players}
+                    if not preview.show(frame, result, loop_fps, controls, gestures, **extra):
+                        break
                 if preview is None and stop_requested():
                     LOGGER.info("Stop key pressed.")
                     break

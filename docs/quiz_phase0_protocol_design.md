@@ -199,9 +199,33 @@ so new settings (round length, audio) need rows in `docs/configuration.md`.
    per-slot `CV_STATE` (`slot` field, one packet and one `stream_id` per slot).
 5. **Difficulty.** Adaptive, shared by the pair, starting at level 1.
 
+## Spike 0a: two people on one webcam (done)
+
+Measured on the development PC and webcam (640x480, light model), two people side by side, one hand each:
+
+| Test | Result |
+| --- | --- |
+| Both hands held still in their own halves | Both tracked in 100% of frames, one in each half |
+| Both waving in their own halves | 100% tracked |
+| Both moving toward the centre line and back | Both tracked in 90% of frames; longest dropout 1.5 s |
+| Both raising both hands (4 hands) with a limit of 2 | Both detections on the same side in 47% of frames: one player lost |
+
+- **Frame rate was 15 fps, set by the camera.** `camera.read` took about 46 ms a frame while MediaPipe took about 20 ms,
+  and the camera reports 30 fps. Earlier runs read frames in 3 to 4 ms, so this is probably the camera lengthening its
+  exposure in dim light. Fifteen samples a second is still enough for a one-second dwell.
+- **Allowing 4 hands costs about 1 ms** (19.5 ms against 20.7 ms) and removes the lost-player case above, so two-player
+  mode looks for 4 hands and keeps the most confident one in each half.
+- **Hand movement is small.** Waving covered about 17% of the picture width per person; reaching toward the centre
+  covered about 36% (left person) and 24% (right person). Each half's middle part is therefore stretched to the full
+  cursor range (`CONTROL_ZONE_EDGE_TRIM`) rather than the whole half.
+- **Not tested:** both people using the same hand (so MediaPipe gives both the same label; here the labels happened to
+  differ), hands crossing the centre line (the closest approach was about 20% of the picture width), and larger
+  distances. Zones do not depend on the label, and the line margin (`CONTROL_ZONE_HYSTERESIS`) is unproven in use.
+
+The Python side is built (`cv_engine/zones.py`, the `slot` field, one stream per player) and unit-tested. It has not yet
+been run with two people on the real camera.
+
 ## Still open
 
-- **Two-person feasibility on real hardware** (spike 0a): FPS, dropped hands and behaviour at the centre line with two
-  people side by side. Needs the webcam, so it is not done yet.
 - **Where the shared level is persisted.** Reach Garden stores its level per machine, not per player; the quiz can do
   the same for the pair. Check `ReachGardenDifficulty.cs` when building it.

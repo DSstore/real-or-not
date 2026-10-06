@@ -49,6 +49,13 @@ class TrackingSettings:
     model_complexity: int = 1
     detection_confidence: float = 0.6
     tracking_confidence: float = 0.6
+    # 1 = one player, the original behaviour. 2 = two players sharing the camera, matched to hands by screen
+    # zone (left half, right half) instead of by MediaPipe's left/right label. See cv_engine.zones.
+    players: int = 1
+
+    def __post_init__(self) -> None:
+        if type(self.players) is not int or not 1 <= self.players <= 2:
+            raise ConfigurationError("TRACKING_PLAYERS must be an integer from 1 to 2.")
 
 
 @dataclass(frozen=True)
@@ -64,9 +71,17 @@ class ControlSettings:
     continuity_seconds: float = 0.3
     # How far (normalized image distance) the palm may move between frames and still count as the same hand.
     continuity_radius: float = 0.25
+    # Two-player zones only. A hand within this distance (normalized image width) of the line between two
+    # zones stays with the player whose hand was just there, so it does not flip players at the line.
+    zone_hysteresis: float = 0.04
+    # Two-player zones only. Share of each zone's width, at each edge, that a hand does not need to reach: the
+    # remaining middle is stretched to the full 0..1 range, because people move their hands over a small range.
+    zone_edge_trim: float = 0.15
 
     def __post_init__(self) -> None:
         checks = (
+            ("CONTROL_ZONE_HYSTERESIS", self.zone_hysteresis, 0 <= self.zone_hysteresis <= 0.25),
+            ("CONTROL_ZONE_EDGE_TRIM", self.zone_edge_trim, 0 <= self.zone_edge_trim < 0.5),
             ("CONTROL_CONTINUITY_SECONDS", self.continuity_seconds, 0 <= self.continuity_seconds <= 1),
             ("CONTROL_CONTINUITY_RADIUS", self.continuity_radius, 0 < self.continuity_radius <= 1),
             ("SMOOTHING_ALPHA", self.smoothing_alpha, 0 < self.smoothing_alpha <= 1),
@@ -264,6 +279,7 @@ def load_settings(
             model_complexity=_integer(values, "TRACKING_MODEL_COMPLEXITY", 1, 0, 1),
             detection_confidence=_confidence(values, "TRACKING_DETECTION_CONFIDENCE", 0.6),
             tracking_confidence=_confidence(values, "TRACKING_MIN_CONFIDENCE", 0.6),
+            players=_integer(values, "TRACKING_PLAYERS", 1, 1, 2),
         ),
         control=ControlSettings(
             smoothing_alpha=_confidence(values, "SMOOTHING_ALPHA", 0.35),
@@ -272,6 +288,8 @@ def load_settings(
             tracking_timeout=_positive_float(values, "CONTROL_TRACKING_TIMEOUT", 0.5),
             continuity_seconds=_confidence(values, "CONTROL_CONTINUITY_SECONDS", 0.3),
             continuity_radius=_confidence(values, "CONTROL_CONTINUITY_RADIUS", 0.25),
+            zone_hysteresis=_confidence(values, "CONTROL_ZONE_HYSTERESIS", 0.04),
+            zone_edge_trim=_confidence(values, "CONTROL_ZONE_EDGE_TRIM", 0.15),
         ),
         gestures=GestureSettings(
             debounce_frames=_integer(values, "GESTURE_DEBOUNCE_FRAMES", 5, 1, 60),

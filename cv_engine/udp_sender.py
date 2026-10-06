@@ -23,9 +23,11 @@ class UdpError(CVEngineError):
 
 def hand_state(
     controls: ControlResult, gestures: GestureResult, hand: str,
-    stream_id: str, sequence: int, timestamp: int, mirrored: bool,
+    stream_id: str, sequence: int, timestamp: int, mirrored: bool, slot: int | None = None,
 ) -> CVState:
-    """Adapt the selected hand only; do not silently switch to the other hand."""
+    """Adapt the selected hand only; do not silently switch to the other hand.
+
+    In two-player mode ``slot`` is the player and ``hand`` names that player's zone ("left" is player 1)."""
     control = next((item for item in controls.hands if item.hand == hand and item.tracking), None)
     gesture = next((item for item in gestures.hands if item.hand == hand and item.tracking), None)
     position = None
@@ -36,7 +38,7 @@ def hand_state(
         tracking=position is not None, position=position,
         gesture=gesture.gesture.value if position is not None and gesture is not None else "UNKNOWN",
         confidence=control.handedness_confidence if position is not None and control is not None else 0.0,
-        mirrored=mirrored,
+        mirrored=mirrored, slot=slot,
     )
 
 
@@ -47,12 +49,14 @@ class UdpSender:
     availability/delivery cannot be established by this one-way protocol.
     """
 
-    def __init__(self, host: str, port: int, settings: SenderSettings, mirrored: bool) -> None:
+    def __init__(self, host: str, port: int, settings: SenderSettings, mirrored: bool,
+                 slot: int | None = None) -> None:
         if type(port) is not int or not 1024 <= port <= 65535:
             raise ValueError("UDP destination port must be from 1024 to 65535.")
         self.destination = (validate_udp_host(host), port)
         self.settings = settings
         self.mirrored = mirrored
+        self.slot = slot  # The player this stream carries in two-player mode; None otherwise.
         self.stream_id = str(uuid4())
         self.sent = self.failed = self.skipped = 0
         self._sequence = 0
@@ -79,8 +83,9 @@ class UdpSender:
                 sock.close()
             raise UdpError("Cannot initialize UDP sender; check local socket permissions or use --no-udp.") from error
         self._socket = sock
-        LOGGER.info("UDP sender ready: %s:%d, target %d Hz, %s hand. Receiver delivery is unconfirmed.",
-                    *self.destination, self.settings.fps, self.settings.hand)
+        who = f"player {self.slot + 1} ({self.settings.hand} half)" if self.slot is not None else f"{self.settings.hand} hand"
+        LOGGER.info("UDP sender ready: %s:%d, target %d Hz, %s. Receiver delivery is unconfirmed.",
+                    *self.destination, self.settings.fps, who)
         return self
 
     def send(self, controls: ControlResult, gestures: GestureResult, now: float) -> bool:
@@ -107,7 +112,7 @@ class UdpSender:
     def _transmit(self, controls: ControlResult, gestures: GestureResult, now: float) -> bool:
         """Allocate a sequence per attempt; dropped sends therefore leave gaps."""
         state = hand_state(controls, gestures, self.settings.hand, self.stream_id,
-                           self._sequence, time_ns() // 1_000_000, self.mirrored)
+                           self._sequence, time_ns() // 1_000_000, self.mirrored, self.slot)
         payload = state.to_bytes()
         self._sequence += 1
         try:
