@@ -1,0 +1,905 @@
+{
+  "version": 2,
+  "questions": [
+    {
+      "id": "sms-01",
+      "category": "sms_phishing",
+      "difficulty": 1,
+      "question": "You get an SMS: \"Congratulations! You won a prize. Tap this link and enter your card details to claim it.\" What should you do?",
+      "choices": [
+        "Tap the link to see what the prize is",
+        "Do not tap the link. Delete the message",
+        "Enter your card details, as they say it is free",
+        "Reply to ask how to claim the prize"
+      ],
+      "correct": 1,
+      "explanation": "Scam messages often promise a prize and ask you to act quickly. They want your money or personal details. Do not tap links in prize messages, and do not reply. You can report suspicious messages to the CheckMate WhatsApp bot.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/identify-different-scams-misinformation-or-spam-online"
+    },
+    {
+      "id": "phone-01",
+      "category": "phone_scam",
+      "difficulty": 1,
+      "question": "A caller says he is a police officer and tells you to move your savings to a \"safe account\" today. What should you do?",
+      "choices": [
+        "Hang up. Call the organisation yourself using its official number",
+        "Move the money, because the police said so",
+        "Give him your bank details so he can check",
+        "Keep him on the line while you do what he says"
+      ],
+      "correct": 0,
+      "explanation": "Real officials will not tell you to transfer money to another account. Scammers use fear and urgency to rush you. Stop talking, hang up, and check by calling the official number you look up yourself. In an emergency, call 999.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/be-safe---online-impersonation-scams-tipsheets"
+    },
+    {
+      "id": "otp-01",
+      "category": "protect_personal_info",
+      "difficulty": 1,
+      "question": "A caller says he is from your bank and asks you to read out the OTP sent to your phone. What should you do?",
+      "choices": [
+        "Read it out, because he is from the bank",
+        "Read out only half of the digits",
+        "Send it to him by SMS instead",
+        "Never share it. Hang up and contact your bank yourself"
+      ],
+      "correct": 3,
+      "explanation": "Your OTP protects your money, and nobody should ask you for it. Never give your OTP or banking information to anyone, even someone who sounds like the bank. Hang up and contact the bank using its official number or app.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/stay-safe-from-phishing-scams"
+    },
+    {
+      "id": "social-01",
+      "category": "social_media_scam",
+      "difficulty": 1,
+      "question": "A post says: \"Win a free phone! Share this post and send us your NRIC and card details.\" What should you do?",
+      "choices": [
+        "Send your details before the prize runs out",
+        "Send only your NRIC, not the card details",
+        "Ignore it. Do not share it or send any details",
+        "Share it so your friends can win too"
+      ],
+      "correct": 2,
+      "explanation": "Contests that ask for a lot of personal data are a warning sign. Your NRIC and card details are what criminals use for scams and fraud. Do not share the post or give any personal information.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/tips-for-adults-on-protecting-their-personal-information"
+    },
+    {
+      "id": "wacode-01",
+      "category": "messaging_safety",
+      "difficulty": 1,
+      "question": "A stranger messages you on WhatsApp: \"I sent a 6-digit WhatsApp code to your number by mistake. Please send it to me.\" What should you do?",
+      "choices": [
+        "Send it, to be helpful",
+        "Do not share the code. Scammers use it to take over your account",
+        "Send it, but only if they say please",
+        "Send it, then delete the chat"
+      ],
+      "correct": 1,
+      "explanation": "Scammers ask for the 6-digit code that WhatsApp sends to you, so they can log in as you and cheat your contacts. Never share this code with anyone. Turn on two-step verification for extra protection.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/ta-be-safe"
+    },
+    {
+      "id": "job-01",
+      "category": "job_loan_scam",
+      "difficulty": 1,
+      "question": "A message offers you $300 a day for a few easy online tasks, but you must first pay a \"refundable\" deposit. What should you do?",
+      "choices": [
+        "Do not pay. High pay for little effort and a deposit up front are warning signs",
+        "Pay the deposit, since it is refundable",
+        "Pay a smaller deposit to test it",
+        "Ask your friends to join and pay too"
+      ],
+      "correct": 0,
+      "explanation": "Scammers dangle fast money, then ask for a deposit first. Be wary of unsolicited job offers with high pay for little effort, and do not pay to get a job. You can read more scam advice at scamalert.sg.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/knowscamnoscam---job-scam"
+    },
+    {
+      "id": "loan-01",
+      "category": "job_loan_scam",
+      "difficulty": 1,
+      "question": "You get a WhatsApp message from an unknown number: \"Instant loan, no interest! Pay a small admin fee first.\" What should you do?",
+      "choices": [
+        "Pay the small fee, since it is small",
+        "Reply with your NRIC to apply",
+        "Share your Singpass details so they can check you",
+        "Ignore it, block the number and report it as spam"
+      ],
+      "correct": 3,
+      "explanation": "Licensed moneylenders do not advertise loans by SMS or WhatsApp, and real lenders do not ask for a fee before the loan is released. Scammers also try to collect your NRIC and Singpass details. Block and report the number, and use only licensed moneylenders on the Ministry of Law Registry of Moneylenders.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/be-safe---loan-scams-tipsheets"
+    },
+    {
+      "id": "fakenews-01",
+      "category": "misinformation",
+      "difficulty": 1,
+      "question": "A friend forwards you a shocking message that says \"Share with everyone now!\" You have not checked if it is true. What should you do?",
+      "choices": [
+        "Forward it quickly in case it is true",
+        "Forward it, but only to family",
+        "Do not forward it. Check it first against reliable sources",
+        "Believe it, because a friend sent it"
+      ],
+      "correct": 2,
+      "explanation": "Fake news spreads when people share before checking. Be sceptical of dramatic headlines and check with other reliable sources. You can also tell the friend who sent it that it may not be true.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/tips-for-seniors-on-dealing-with-fake-news"
+    },
+    {
+      "id": "ai-01",
+      "category": "genai",
+      "difficulty": 1,
+      "question": "An AI chatbot gives you a confident answer about a health or money question. What is the wise thing to do?",
+      "choices": [
+        "Trust it, because it sounded sure",
+        "Check important facts with a reliable source before acting",
+        "Trust it, because it is a computer",
+        "Trust it if the answer is long"
+      ],
+      "correct": 1,
+      "explanation": "Generative AI can state false or outdated things very confidently. This is called hallucination. Check important facts, especially about health, money or legal matters, with reliable sources, and stay in charge of the decision yourself.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/understand-risks-associated-with-gen-ai"
+    },
+    {
+      "id": "lock-01",
+      "category": "device_security",
+      "difficulty": 1,
+      "question": "Your phone has no lock, so anyone who picks it up can open it. What is the best fix?",
+      "choices": [
+        "Set a screen lock with a PIN, pattern, face or fingerprint",
+        "Keep the screen brightness low",
+        "Turn the phone off when you are not using it",
+        "Hide the phone icon on your home screen"
+      ],
+      "correct": 0,
+      "explanation": "A screen lock stops other people from opening your phone, apps and messages if it is lost or stolen. Choose a PIN, pattern, face or fingerprint that others cannot easily guess.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/personalising-your-devices-software-and-hardware-settings"
+    },
+    {
+      "id": "apps-01",
+      "category": "device_security",
+      "difficulty": 1,
+      "question": "You want a new app on your phone. Where is the safest place to download it?",
+      "choices": [
+        "A link sent to you in an SMS",
+        "A website that offers it free",
+        "A link from a stranger in a chat group",
+        "The official app store: Apple App Store or Google Play Store"
+      ],
+      "correct": 3,
+      "explanation": "Fake apps can steal your data or money. Download apps only from the official app store on your phone, and uninstall apps you no longer need.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/explore-and-download-apps-on-your-mobile-device"
+    },
+    {
+      "id": "scroll-01",
+      "category": "digital_wellbeing",
+      "difficulty": 1,
+      "question": "You keep scrolling through bad news online and now feel worried and low. What should you do?",
+      "choices": [
+        "Keep scrolling until you find good news",
+        "Scroll faster to finish it all",
+        "Put the phone down, take a break and talk to someone",
+        "Turn on more notifications to stay updated"
+      ],
+      "correct": 2,
+      "explanation": "Endless scrolling of bad news can raise stress and anxiety. Decide what you want to see before you go online, use a timer, and stop when you feel low. Talk to someone if it affects your mood.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/from-doomscrolling-to-mindful-scrolling"
+    },
+    {
+      "id": "phone-02",
+      "category": "phone_scam",
+      "difficulty": 2,
+      "question": "A caller says a parcel in your name was held by customs and you must pay a fine now, or you will be in trouble. What should you do?",
+      "choices": [
+        "Pay quickly to avoid trouble",
+        "Hang up. Do not pay, and check with the real organisation yourself",
+        "Give your NRIC so they can find the parcel",
+        "Press 1 to speak to an officer"
+      ],
+      "correct": 1,
+      "explanation": "Scammers pretend a parcel was held or that you broke a law, then demand money or personal details. Hang up, and contact the real organisation using an official number you look up yourself.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/anti-scam-safety-guide-wechat"
+    },
+    {
+      "id": "love-01",
+      "category": "love_scam",
+      "difficulty": 2,
+      "question": "You have chatted online for two months with someone you have never met. They suddenly ask you to send money urgently. What should you do?",
+      "choices": [
+        "Do not send money. Talk to a family member or friend you trust",
+        "Send the money, since you have talked for so long",
+        "Send a small amount first to test them",
+        "Ask them to send a photo, then send the money"
+      ],
+      "correct": 0,
+      "explanation": "Be wary of unsolicited friend requests and of urgent money requests from someone you only know online. Scammers build trust first, then ask for money. Talk to someone you trust, and read more at scamalert.sg.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/knowscamnoscam---love-scam"
+    },
+    {
+      "id": "shop-01",
+      "category": "ecommerce_scam",
+      "difficulty": 2,
+      "question": "You are buying online. The seller says: \"Skip the app's payment. Pay by direct bank transfer to get a discount.\" What should you do?",
+      "choices": [
+        "Pay by bank transfer to save money",
+        "Pay half now and half later",
+        "Pay, then report if the item does not arrive",
+        "Say no. Pay only through the platform's own payment system"
+      ],
+      "correct": 3,
+      "explanation": "A seller who asks you to bypass the platform's payment is a warning sign. Use the platform's own payment only, so the sale stays inside the platform.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/protective-measures-after-falling-victim-to-a-scam"
+    },
+    {
+      "id": "invest-01",
+      "category": "investment_scam",
+      "difficulty": 2,
+      "question": "A WhatsApp group promises \"guaranteed 30% profit every month, no risk\". What is the safest choice?",
+      "choices": [
+        "Join with a small amount to try it",
+        "Join, because many members show profits",
+        "Stay away. An offer that sounds too good to be true is a warning sign",
+        "Ask the group admin if it is safe"
+      ],
+      "correct": 2,
+      "explanation": "Scams often use offers that are too good to be true and pressure you to act fast. Slow down, ask a trusted family member, and contact the company only through its official contact details.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/your-guide-to-spotting-scams"
+    },
+    {
+      "id": "email-01",
+      "category": "email_phishing",
+      "difficulty": 2,
+      "question": "An email says: \"Your account will close in 24 hours. Click here to confirm your card details.\" You cannot tell who sent it. What should you do?",
+      "choices": [
+        "Click the link and confirm your details",
+        "Do not reply or click. Check with the organisation through its official website or hotline",
+        "Reply and ask them to explain",
+        "Open the attachment to read more"
+      ],
+      "correct": 1,
+      "explanation": "A message that asks you to confirm card details on a link is a phishing sign. If you cannot confirm who sent a message, do not reply or click. Contact the organisation yourself through its official website or hotline.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/be-safe---data-protection-tipsheets"
+    },
+    {
+      "id": "bank-01",
+      "category": "banking_payments",
+      "difficulty": 2,
+      "question": "Your banking app shows a request to approve a transaction that you did not make. What should you do?",
+      "choices": [
+        "Tap Reject, and tell your bank if you are worried",
+        "Approve it, in case it is a bank test",
+        "Ignore it and do nothing",
+        "Approve it and check later"
+      ],
+      "correct": 0,
+      "explanation": "Always check every transaction before you approve it in your banking app. If it is not yours, tap Reject. Scammers may try to get you to approve something that moves your money.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/stay-safe-from-phishing-scams"
+    },
+    {
+      "id": "govsms-01",
+      "category": "singpass_services",
+      "difficulty": 2,
+      "question": "You get an SMS that says it is from the government. How can you check that it is real?",
+      "choices": [
+        "Check if the message has your name in it",
+        "Check if it has a link you can tap",
+        "Check if it says it is urgent",
+        "Look at the sender name. Real government SMSes come from \"gov.sg\""
+      ],
+      "correct": 3,
+      "explanation": "Since 1 July 2024, government SMSes are sent under the Sender ID \"gov.sg\". If an SMS claims to be from the government but does not use this sender name, do not trust it.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/sms-from-government"
+    },
+    {
+      "id": "fakenews-02",
+      "category": "misinformation",
+      "difficulty": 2,
+      "question": "A news story with a dramatic headline appears on only one website, which has no About or Contact page. What should you do?",
+      "choices": [
+        "Believe it, because it is online",
+        "Share it first, then check",
+        "Be careful. Check whether other reliable sources report the same story",
+        "Trust it if it has many words"
+      ],
+      "correct": 2,
+      "explanation": "Warning signs of fake news include dramatic headlines, poor spelling or grammar, no About or Contact page, and a story that appears on only one site. Check other reliable sources, or a fact-checker such as gov.sg/factually, before you believe or share it.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/tips-for-seniors-on-dealing-with-fake-news"
+    },
+    {
+      "id": "ai-02",
+      "category": "genai",
+      "difficulty": 2,
+      "question": "An AI chatbot asks for your full name, address and bank details \"to help you better\". What should you do?",
+      "choices": [
+        "Share them, since it is only a computer",
+        "Do not share them. Avoid giving AI tools personal or financial details",
+        "Share your address but not the bank details",
+        "Share them if the chatbot says please"
+      ],
+      "correct": 1,
+      "explanation": "Do not share sensitive details such as your full name, address, phone number or financial information with AI tools. Answers about health, money or law should also be double-checked.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/how-to-use-chatgpt-beginners-guide"
+    },
+    {
+      "id": "wa2sv-01",
+      "category": "messaging_safety",
+      "difficulty": 2,
+      "question": "You turn on two-step verification in WhatsApp. What does it add?",
+      "choices": [
+        "A PIN that adds protection to your account",
+        "A way to see who read your messages",
+        "A faster way to send photos",
+        "Free calls overseas"
+      ],
+      "correct": 0,
+      "explanation": "Two-step verification adds a PIN to your WhatsApp account. You turn it on in Settings, then Account, then Two-step verification. You can add a recovery email in case you forget the PIN.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/how-to-use-two-step-verification-privacy-tips-whatsapp"
+    },
+    {
+      "id": "wifi-01",
+      "category": "device_security",
+      "difficulty": 2,
+      "question": "You are in a cafe with free public Wi-Fi. You need to check your bank balance. What is the better choice?",
+      "choices": [
+        "Go ahead, because the Wi-Fi is free",
+        "Use the public Wi-Fi but write the password down",
+        "Log in twice to be safe",
+        "Wait, and use your own mobile data or a network you trust"
+      ],
+      "correct": 3,
+      "explanation": "Avoid personal or confidential transactions, such as banking, on public Wi-Fi. Other people may be able to intercept what you send. Use your mobile data, or wait until you are on a network you trust.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/be-safe---data-protection-tipsheets"
+    },
+    {
+      "id": "pass-01",
+      "category": "protect_personal_info",
+      "difficulty": 2,
+      "question": "Which is the strongest password choice for your online accounts?",
+      "choices": [
+        "Your birthday",
+        "The word \"password\" with a number",
+        "A passphrase of 12 or more characters, such as five random words",
+        "The same password for every account"
+      ],
+      "correct": 2,
+      "explanation": "A strong passphrase is at least 12 characters long, for example five random words. Use a different one for each account and turn on 2FA, because reusing passwords puts every account at risk.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/protecting-your-personal-information"
+    },
+    {
+      "id": "sms-02",
+      "category": "sms_phishing",
+      "difficulty": 3,
+      "question": "An SMS says: \"Your parcel could not be delivered. Pay $1.50 at this short link to reschedule.\" You are not expecting a parcel. What should you do?",
+      "choices": [
+        "Pay, since the fee is only $1.50",
+        "Do not tap the link. Check using the courier's official app or website",
+        "Tap the link only to read it",
+        "Reply STOP to the SMS"
+      ],
+      "correct": 1,
+      "explanation": "Scam messages ask you to take action and often use shortened or scrambled links. Do not tap short links. If you are worried, check through the official app or website of the company, which you open yourself.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/identify-different-scams-misinformation-or-spam-online"
+    },
+    {
+      "id": "phone-03",
+      "category": "phone_scam",
+      "difficulty": 3,
+      "question": "A caller says he is from a government agency. He tells you to stay on the line and pay a fine right now. What should you do?",
+      "choices": [
+        "Hang up, then verify using the official hotline or website",
+        "Stay on the line, as he says",
+        "Pay, to avoid trouble",
+        "Ask for his name and then pay"
+      ],
+      "correct": 0,
+      "explanation": "Government officials never demand immediate payment, ask you to transfer money, or forbid you from hanging up. Do not panic. Hang up and verify through the official hotline, app or website, not through details the caller gives.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/ta-be-safe"
+    },
+    {
+      "id": "site-01",
+      "category": "fake_website",
+      "difficulty": 3,
+      "question": "You search for your bank online. The first result has a small \"Sponsored\" label. What is the safest way to reach your bank's site?",
+      "choices": [
+        "Click the first result, since it is at the top",
+        "Click any result that looks like the bank",
+        "Click the result with the most words",
+        "Type the bank's full official web address, or use its official app"
+      ],
+      "correct": 3,
+      "explanation": "Sponsored results are ads, and the first result may not be the official site. For sites that handle your money or personal details, typing the full official address, or using the official app, is safer.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/navigating-information-on-the-internet"
+    },
+    {
+      "id": "job-02",
+      "category": "job_loan_scam",
+      "difficulty": 3,
+      "question": "A WhatsApp message from an unknown number invites you to join a paid survey panel for big pay. What should you check first?",
+      "choices": [
+        "Whether the message has nice pictures",
+        "Whether many people have joined",
+        "Whether the company has real credentials, such as a UEN, address and phone number",
+        "Whether the message looks friendly"
+      ],
+      "correct": 2,
+      "explanation": "Research the company and read reviews, and check that it has real credentials such as a physical address, phone number and UEN. Be careful with unsolicited invitations and big pay for little effort, and never share your PIN, password or OTP.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/side-hustles-and-scams"
+    },
+    {
+      "id": "fakenews-03",
+      "category": "misinformation",
+      "difficulty": 3,
+      "question": "You are not sure if a website can be trusted. What does \"lateral reading\" suggest you do?",
+      "choices": [
+        "Read the same page again more slowly",
+        "Open other reliable sources to check the website and its claims",
+        "Read the comments under the page",
+        "Read only the headline carefully"
+      ],
+      "correct": 1,
+      "explanation": "Lateral reading means leaving the page and checking what other reliable sources say about the website and its claims. It helps you judge a source instead of trusting how it looks. Fact-check sites such as gov.sg/factually can also help.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/tips-for-adults-on-dealing-with-fake-news"
+    },
+    {
+      "id": "ai-03",
+      "category": "genai",
+      "difficulty": 3,
+      "question": "An AI chatbot gives you website links to \"prove\" its answer. What should you remember?",
+      "choices": [
+        "AI can invent facts and fake links, so check them yourself",
+        "AI links are always real",
+        "A link is real if the AI sounds sure",
+        "Only the first link needs checking"
+      ],
+      "correct": 0,
+      "explanation": "AI can give inaccurate facts and links that do not exist. Check every important claim and link, and use AI to help your own thinking rather than replace it.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/gen-ai-in-schools"
+    },
+    {
+      "id": "bank-02",
+      "category": "banking_payments",
+      "difficulty": 3,
+      "question": "You lose your phone, and it has a phone wallet with your cards. What is a good step?",
+      "choices": [
+        "Wait a week in case it turns up",
+        "Do nothing, since it has a lock",
+        "Delete the app from your new phone only",
+        "Block payments remotely and tell your bank"
+      ],
+      "correct": 3,
+      "explanation": "Phone wallet payments are protected by your fingerprint, face or PIN, but you should still act fast if your phone is lost. Block payments remotely and contact your bank. It also helps to switch on transaction alerts from your bank.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/set-up-and-use-apple-pay-or-google-pay"
+    },
+    {
+      "id": "singpass-02",
+      "category": "singpass_services",
+      "difficulty": 3,
+      "question": "A caller offers to \"help\" with your government application and asks for your Singpass 6-digit passcode. What should you do?",
+      "choices": [
+        "Share it, since the caller is helping",
+        "Share half of the passcode",
+        "Never share it. Your Singpass passcode is only for you",
+        "Share it if the caller knows your NRIC"
+      ],
+      "correct": 2,
+      "explanation": "Singpass is the official digital identity of the Singapore Government, so protect your passcode and your device. Get the Singpass app only from the official App Store or Google Play, and do not give your passcode to anyone.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/accessing-essential-citizen-services"
+    },
+    {
+      "id": "waapp-01",
+      "category": "messaging_safety",
+      "difficulty": 3,
+      "question": "You see an app that claims to add extra features to WhatsApp. What should you do?",
+      "choices": [
+        "Download it, because extra features are useful",
+        "Do not download it. Use only the official WhatsApp app",
+        "Download it if it has good reviews",
+        "Download it, then delete it if it is slow"
+      ],
+      "correct": 1,
+      "explanation": "Fake apps that copy WhatsApp or add extra features can look the same but risk identity fraud, data theft and malware. The real WhatsApp has built-in protection that fake apps lack.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/how-to-spot-fake-apps-too-fake-to-be-true-whatsapp"
+    },
+    {
+      "id": "breach-01",
+      "category": "protect_personal_info",
+      "difficulty": 3,
+      "question": "You get a message saying your data was in a breach, with a link to \"check\" it. What is the safest step?",
+      "choices": [
+        "Verify through the organisation's official website or hotline, not the link",
+        "Tap the link to check quickly",
+        "Reply with your details to confirm",
+        "Forward it to your contacts"
+      ],
+      "correct": 0,
+      "explanation": "Scammers pretend to be organisations notifying you of a data breach. Check breach notices through the organisation's official website or hotline, not through the link in the message.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/online-safety-and-wellness"
+    },
+    {
+      "id": "tech-01",
+      "category": "device_security",
+      "difficulty": 3,
+      "question": "A caller says he is from your internet company. He says your connection is faulty and asks you to install software so he can \"fix\" it. What should you do?",
+      "choices": [
+        "Install it, as he is from the company",
+        "Install it but do not give the password",
+        "Ask him to send a link by SMS",
+        "Do not install anything. Hang up and call the company on its official number"
+      ],
+      "correct": 3,
+      "explanation": "Tech support scams pretend to be from a telco or internet company and ask you to install software. Never install software or give remote access because a caller asks. Check by contacting the company yourself.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/be-safe---data-protection-tipsheets"
+    },
+    {
+      "id": "share-01",
+      "category": "misinformation",
+      "difficulty": 3,
+      "question": "You see an article headline and want to share it. You have not read the article. What should you do?",
+      "choices": [
+        "Share it now, as the headline is clear",
+        "Share it, and read it later",
+        "Read the whole article first, and think about the people you will send it to",
+        "Share it if it has many likes"
+      ],
+      "correct": 2,
+      "explanation": "A headline alone is not enough to judge an article. Read or watch the whole item before you share, and think about the effect on the people who will receive it.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/before-you-tap-share-hit-pause"
+    },
+    {
+      "id": "phone-04",
+      "category": "phone_scam",
+      "difficulty": 4,
+      "question": "A caller says he is from your bank. When you doubt him, he says: \"Call this number to check, it is our hotline.\" What should you do?",
+      "choices": [
+        "Call the number he gave, because he offered it",
+        "Hang up, and look up the bank's official number yourself",
+        "Call it, but give no details",
+        "Ask him to call back from another number"
+      ],
+      "correct": 1,
+      "explanation": "Verify by calling the organisation's official main number, not the number the caller gives you. A number given by the caller may lead straight back to the scammer. Stop talking if you are unsure, then check the source yourself.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/be-safe---online-impersonation-scams-tipsheets"
+    },
+    {
+      "id": "chat-01",
+      "category": "social_media_scam",
+      "difficulty": 4,
+      "question": "A message from a family member's account says: \"I am in a hurry. Please send me money now.\" It feels a little unusual. What should you do?",
+      "choices": [
+        "Stop, and call your family member on the number you already know",
+        "Send the money first, then ask later",
+        "Reply to ask for their bank details",
+        "Ask them to send a photo"
+      ],
+      "correct": 0,
+      "explanation": "Hacked or spoofed accounts can pose as friends or family. Be wary of unusual requests, especially for money. Stop, and check with the person using a number you already have before you send anything.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/be-safe---online-impersonation-scams-tipsheets"
+    },
+    {
+      "id": "deepfake-01",
+      "category": "genai",
+      "difficulty": 4,
+      "question": "You get a video call from someone who looks and sounds like a relative and asks you to transfer money now. What is the safest step?",
+      "choices": [
+        "Transfer the money, as it looks and sounds like them",
+        "Transfer a small amount first",
+        "Ask them to switch the camera on, then transfer",
+        "End the call and phone your relative on a number you know"
+      ],
+      "correct": 3,
+      "explanation": "Criminals can use AI to copy faces and voices, including those of loved ones. This is called a deepfake. Verify unexpected money requests by calling back on a number you already know.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/what-are-deepfakes"
+    },
+    {
+      "id": "deepfake-02",
+      "category": "investment_scam",
+      "difficulty": 4,
+      "question": "A video shows a famous person praising an investment and urging you to join now. What should you do?",
+      "choices": [
+        "Join, because a famous person recommends it",
+        "Join with a small amount",
+        "Be careful. It could be a deepfake, so check with trusted sources first",
+        "Share it so others can join"
+      ],
+      "correct": 2,
+      "explanation": "Scammers can use AI-made videos of celebrities to promote investments. A famous face does not prove an investment is safe. Check with trusted sources, and do not rush.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/online-safety-and-wellness"
+    },
+    {
+      "id": "fakeface-01",
+      "category": "misinformation",
+      "difficulty": 4,
+      "question": "Which is a clue that a video may be a deepfake?",
+      "choices": [
+        "The video is short",
+        "Unnatural face movements, odd lighting, or blurring around the edge of the face",
+        "The video is in colour",
+        "The video has music"
+      ],
+      "correct": 1,
+      "explanation": "Deepfake clues include unnatural facial expressions, inconsistent resolution or lighting, and blurring around the edges of the face. Check the content against other trusted sources and do not share it if you are unsure.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/spot-the-signs-of-deepfakes"
+    },
+    {
+      "id": "email-02",
+      "category": "email_phishing",
+      "difficulty": 4,
+      "question": "An email looks like it is from a senior government leader and asks you to reply with personal details. What should you do?",
+      "choices": [
+        "Do not reply. Check using reliable sources or the official website",
+        "Reply, because it is from a leader",
+        "Forward it to your friends to warn them",
+        "Reply with only your name"
+      ],
+      "correct": 0,
+      "explanation": "Fake emails pretending to be from officials have been used to get people to reply. Check against reliable sources before you respond or forward, and use scamalert.sg or the Anti-Scam hotline if you are unsure.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/be-smart---responsible-sharing-tipsheets"
+    },
+    {
+      "id": "bank-03",
+      "category": "banking_payments",
+      "difficulty": 4,
+      "question": "Why is a digital token in your banking app safer than relying only on SMS OTPs?",
+      "choices": [
+        "Tokens are free",
+        "Tokens do not need a phone",
+        "Tokens let the bank call you",
+        "Scammers can trick people into revealing SMS OTPs"
+      ],
+      "correct": 3,
+      "explanation": "Phishing tricks people into giving passwords and OTPs. A digital token in your bank app is safer because scammers can trick people into revealing OTPs. Update your banking app promptly and check each transaction before you approve it.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/stay-safe-from-phishing-scams"
+    },
+    {
+      "id": "vault-01",
+      "category": "banking_payments",
+      "difficulty": 4,
+      "question": "What does a bank feature such as POSB or DBS digiVault do?",
+      "choices": [
+        "It sends you a new password each day",
+        "It hides your balance from the bank",
+        "It locks your savings against scam transfers, and you can unlock at an ATM",
+        "It pays you extra interest for waiting"
+      ],
+      "correct": 2,
+      "explanation": "digiVault lets you lock part or all of your savings so scammers cannot make unauthorised digital transfers from your phone. Locked money keeps earning interest, and you can unlock it at an ATM.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/posb-digivault"
+    },
+    {
+      "id": "govapp-01",
+      "category": "device_security",
+      "difficulty": 4,
+      "question": "On an Android phone, you want a government app. How can you tell the app is really linked to the government?",
+      "choices": [
+        "Check that the app has many downloads",
+        "Look for the government badge next to the app's rating in Google Play",
+        "Check that the app icon looks official",
+        "Check that the app is free"
+      ],
+      "correct": 1,
+      "explanation": "Google Play shows a government badge, a building icon beside the rating, for apps it has verified as government-affiliated. Check for the badge before you install a government app, and report suspicious apps to Google Play.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/check-out-google-play-government-badge"
+    },
+    {
+      "id": "qr-01",
+      "category": "device_security",
+      "difficulty": 4,
+      "question": "You see a QR code stuck on a lamp post that promises a free gift if you scan it. What should you do?",
+      "choices": [
+        "Do not scan it. Check that a QR code is genuine before you use it",
+        "Scan it, since it is free",
+        "Scan it but do not tap anything",
+        "Scan it and share the link"
+      ],
+      "correct": 0,
+      "explanation": "QR codes can be malicious. Check that a QR code is legitimate before you scan or act on it, and be careful with unexpected or tampered-looking codes.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/malicious-qr-codes"
+    },
+    {
+      "id": "companion-01",
+      "category": "genai",
+      "difficulty": 4,
+      "question": "Your friend chats with an AI companion app for hours every day and has stopped meeting friends. What is the healthy approach?",
+      "choices": [
+        "Let the app replace real friends",
+        "Ask the app for medical advice",
+        "Share bank details with the app so it can help",
+        "Use it in moderation, and keep real friends and family as the priority"
+      ],
+      "correct": 3,
+      "explanation": "An AI companion imitates empathy but does not feel or understand. Use it in moderation, keep real-world relationships as the priority, and do not rely on it for medical, financial or relationship advice. Avoid giving it passwords or personal details.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/ai-companions-ai-chatbot-risks"
+    },
+    {
+      "id": "footprint-01",
+      "category": "digital_wellbeing",
+      "difficulty": 4,
+      "question": "You post a photo, then delete it an hour later. What is true?",
+      "choices": [
+        "It is gone for good",
+        "Only you could ever see it",
+        "It may still exist, because others may have copied or saved it",
+        "It is deleted from every phone"
+      ],
+      "correct": 2,
+      "explanation": "Everything you do online leaves a trail, even deleted items. Content is hard to take back and can spread beyond the people you meant to show. Think before you post, limit location sharing, and check who can see your posts.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/educators-lessons-on-digital-footprints"
+    },
+    {
+      "id": "phone-05",
+      "category": "phone_scam",
+      "difficulty": 5,
+      "question": "A friendly caller from \"your telco\" knows your name. He says he needs to install an app on your phone to check for problems. What should you do?",
+      "choices": [
+        "Install it, because he knows your name",
+        "Say no and hang up. Never give remote access unless the caller is proven to be official",
+        "Install it but watch what he does",
+        "Install it if he gives a reference number"
+      ],
+      "correct": 1,
+      "explanation": "Knowing your name does not prove who a caller is. Never give remote access unless the representative is proven official, and do not download anything before you have verified the source.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/be-safe---online-impersonation-scams-tipsheets"
+    },
+    {
+      "id": "ticket-01",
+      "category": "ecommerce_scam",
+      "difficulty": 5,
+      "question": "Concert tickets are for sale far below the usual price by a seller with no reviews who wants payment first. What is the safest choice?",
+      "choices": [
+        "Do not buy. Use a platform that releases payment only after you receive the item",
+        "Buy, since cheap tickets sell fast",
+        "Pay half to be safe",
+        "Buy if the seller shares a friendly photo"
+      ],
+      "correct": 0,
+      "explanation": "A price much lower than usual, no reviews and a request to pay upfront are warning signs. Use platforms that release payment only after you receive the item, prefer meet-ups or pay on delivery, and check sellers on the CASE Company Alert List.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/be-safe---e-commerce-scams-tipsheets"
+    },
+    {
+      "id": "fakeapp-01",
+      "category": "investment_scam",
+      "difficulty": 5,
+      "question": "Someone recommends an investment app that is not in the Apple App Store or Google Play, and says to install it from a link. What should you do?",
+      "choices": [
+        "Install it, because a friend recommends it",
+        "Install it and check the permissions later",
+        "Install it and invest only a little",
+        "Do not install it. Apps from outside the official stores can be malicious"
+      ],
+      "correct": 3,
+      "explanation": "Scammers entice people to install malicious apps from outside the official stores, which can infect the phone and steal personal data and money. Install apps only from official app stores, and do not grant excessive or unnecessary permissions.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/malicious-apps"
+    },
+    {
+      "id": "love-02",
+      "category": "love_scam",
+      "difficulty": 5,
+      "question": "A new online friend says they love you after only a week. Then they ask you urgently for money for an emergency. What is this?",
+      "choices": [
+        "A sign they truly care, so help them",
+        "A test of trust, so send a small amount",
+        "A warning sign of a love scam. Do not send money, and talk to someone you trust",
+        "A normal way to start a friendship"
+      ],
+      "correct": 2,
+      "explanation": "In a love scam, a quick bond is followed by an urgent request for money. Be wary of unsolicited friend requests and money requests from someone you only know online. Do not send money, and talk to a family member or friend you trust.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/knowscamnoscam---love-scam"
+    },
+    {
+      "id": "currency-01",
+      "category": "misinformation",
+      "difficulty": 5,
+      "question": "An old article about a medicine is being shared as if it is new. Which check helps you most?",
+      "choices": [
+        "Length: how long the article is",
+        "Currency: is the information up to date?",
+        "Colour: how professional the page looks",
+        "Likes: how many people liked it"
+      ],
+      "correct": 1,
+      "explanation": "Judge online information by its accuracy (is it correct), authority (who is behind it) and currency (is it up to date). Old information shared as new can mislead you, so check the date and look at other sources.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/evaluate-online-info-critically"
+    },
+    {
+      "id": "sure-01",
+      "category": "genai",
+      "difficulty": 5,
+      "question": "The S.U.R.E. steps help you check information, including what AI tells you. What does the \"R\" stand for?",
+      "choices": [
+        "Research: look at other trusted sources",
+        "Report: tell the police",
+        "Remember: save it for later",
+        "Reply: answer the sender"
+      ],
+      "correct": 0,
+      "explanation": "S.U.R.E. stands for Source, Understand, Research and Evaluate. Use the steps on what you see online and on what AI tells you, and verify through trusted sources.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/what-is-generative-ai"
+    },
+    {
+      "id": "singpass-03",
+      "category": "singpass_services",
+      "difficulty": 5,
+      "question": "Singpass now has extra safeguards, such as extra face verification checks. What should you still do?",
+      "choices": [
+        "Relax, because scams can no longer happen",
+        "Share your passcode with family to be safe",
+        "Write your passcode on your phone case",
+        "Stay vigilant, because scams keep changing, and protect your Singpass"
+      ],
+      "correct": 3,
+      "explanation": "Safeguards help, but scams evolve, and everyone has a part to play in protecting their Singpass. Stay alert and never share your passcode.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/keeping-your-singpass-safe"
+    },
+    {
+      "id": "harass-01",
+      "category": "messaging_safety",
+      "difficulty": 5,
+      "question": "Someone keeps sending you threatening messages online. What is a sensible first step?",
+      "choices": [
+        "Reply angrily so they stop",
+        "Delete everything straight away",
+        "Take screenshots as evidence, do not reply, and report to the platform",
+        "Delete the chat and tell nobody"
+      ],
+      "correct": 2,
+      "explanation": "It is not your fault. Do not engage, keep evidence with screenshots before it is deleted, block and report to the platform, and tell someone you trust. If there are credible threats to your safety, call the police.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/advice-on-online-harassment"
+    },
+    {
+      "id": "fakesite-02",
+      "category": "fake_website",
+      "difficulty": 5,
+      "question": "You open a page that looks like your bank's, but the web address is not your bank's real address. It asks for your NRIC and card details. What should you do?",
+      "choices": [
+        "Log in, since the page looks the same",
+        "Close it. Check the web address, and use the bank's official app or site",
+        "Log in with a different password",
+        "Bookmark it for next time"
+      ],
+      "correct": 1,
+      "explanation": "Fake government or banking sites copy the real thing to collect NRIC, passport or financial details. The look of a page is not proof. Check that the address is the authentic one, or go through the bank's official app or an address you typed yourself.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/tips-for-adults-on-protecting-their-personal-information"
+    },
+    {
+      "id": "bank-04",
+      "category": "banking_payments",
+      "difficulty": 5,
+      "question": "You check your transport card app and see a payment you do not recognise. What is a good step?",
+      "choices": [
+        "Review your transaction history, and block the card payment if needed",
+        "Ignore it, because it is probably small",
+        "Wait until the end of the year",
+        "Ask a stranger online to check it"
+      ],
+      "correct": 0,
+      "explanation": "Review your transaction history regularly, and log out of payment apps when you are done. Know how to block a card payment and request a refund. If you do not recognise a payment, act early.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/navigating-public-transport-and-ride-hailing-apps"
+    },
+    {
+      "id": "email-03",
+      "category": "email_phishing",
+      "difficulty": 5,
+      "question": "An email says \"Your parcel details\" and has an attachment named \"invoice.exe\". You did not order anything. What should you do?",
+      "choices": [
+        "Open it to see what it is",
+        "Forward it to a friend to check",
+        "Reply to ask the sender",
+        "Do not open it. Delete the email, since attachments like this can be harmful"
+      ],
+      "correct": 3,
+      "explanation": "Phishing emails can include suspicious attachments, such as .exe files. Do not click links or open attachments you did not expect. Delete the message and, if unsure, check with the organisation through its official website or hotline.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/ta-be-safe"
+    },
+    {
+      "id": "social-02",
+      "category": "social_media_scam",
+      "difficulty": 5,
+      "question": "A Facebook friend messages: \"Sorry, I sent my OTP to your phone by mistake. Please send it to me.\" What should you do?",
+      "choices": [
+        "Send it, because it is a friend",
+        "Send it, then change your password",
+        "Do not send it. Call your friend on a number you know to check",
+        "Send it if they say it is urgent"
+      ],
+      "correct": 2,
+      "explanation": "Scammers pretend to be friends and ask for an OTP \"sent by mistake\". Never share an OTP with anyone. Check by calling your friend on a number you already know.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/ta-be-safe"
+    }
+  ]
+}

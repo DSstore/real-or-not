@@ -47,8 +47,13 @@ TestResult.xml
 Thumbs.db
 Desktop.ini
 
-# Local result store written by backend.result_receiver
-data/
+# Local result store written by backend.result_receiver, and the local recently-asked-questions list;
+# only the question bank itself is part of the project
+data/*
+!data/questions.json
 
 # Generated progress reports
 reports/
+
+# Standalone Windows player built by scripts/build-player.ps1
+unity/MotionPlay/Builds/
