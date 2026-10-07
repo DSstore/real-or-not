@@ -213,8 +213,13 @@ Measured on the development PC and webcam (640x480, light model), two people sid
 - **Frame rate was 15 fps, set by the camera.** `camera.read` took about 46 ms a frame while MediaPipe took about 20 ms,
   and the camera reports 30 fps. Earlier runs read frames in 3 to 4 ms, so this is probably the camera lengthening its
   exposure in dim light. Fifteen samples a second is still enough for a one-second dwell.
-- **Allowing 4 hands costs about 1 ms** (19.5 ms against 20.7 ms) and removes the lost-player case above, so two-player
-  mode looks for 4 hands and keeps the most confident one in each half.
+- **Two-player mode looks for 2 hands, one per person.** There is only room for one hand each, so the limit is 2 and
+  players are asked to use one hand: if one person raises a second hand, MediaPipe may report it instead of the other
+  person's hand (the 47% case above). I first set the limit to 4 to prevent that, on a measurement of about 1 ms extra
+  per frame (19.5 ms against 20.7 ms). That measurement was taken with no hands in view and was wrong for real use: in a
+  live run with two hands in view, a limit of 4 took MediaPipe from about 18 ms to 33 to 52 ms a frame and the loop from
+  30 to about 22 fps, probably because MediaPipe keeps running its slower hand search on every frame while it tracks
+  fewer hands than it may return.
 - **Hand movement is small.** Waving covered about 17% of the picture width per person; reaching toward the centre
   covered about 36% (left person) and 24% (right person). Each half's middle part is therefore stretched to the full
   cursor range (`CONTROL_ZONE_EDGE_TRIM`) rather than the whole half.

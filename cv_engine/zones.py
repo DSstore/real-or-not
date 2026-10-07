@@ -27,10 +27,49 @@ from shared.config import ControlSettings
 # Player 1 is the left zone, player 2 the right zone.
 ZONE_LABELS = ("left", "right")
 MAX_PLAYERS = len(ZONE_LABELS)
-# MediaPipe picks which hands to report when more are visible than it may return. With only two allowed, a spare
-# hand (someone raising both hands) can push out another player's hand, so look for more than the players need.
-# The test showed four costs about 1 ms more per frame than two.
-DETECTION_LIMIT = 4
+# One hand per player, so look for two hands in all. There is only room for one hand each, and MediaPipe runs its
+# slower hand search on every frame while it tracks fewer hands than it may return, so a higher limit costs frame rate
+# (a live run with a limit of 4 and two hands in view went from 30 to about 22 fps). The catch: if one person raises
+# a second hand, MediaPipe may report it instead of the other player's hand. Players are asked to use one hand each.
+DETECTION_LIMIT = 2
+
+
+class PlayerTally:
+    """How well one player's hand was tracked during a run: for the run summary, not for control.
+
+    A dropout is any frame without the player's hand after it had been tracked; lowering a hand counts as one, so the
+    numbers show how often and how long a hand went missing, not why. Short gaps are the likelier tracking losses and
+    long ones the likelier lowered hands, so the summary counts the short ones separately."""
+
+    SHORT_GAP_SECONDS = 0.5
+
+    def __init__(self) -> None:
+        self.frames = self.tracked = self.dropouts = self.short_dropouts = 0
+        self.longest_dropout = 0.0
+        self._seen = False
+        self._dropout_start: float | None = None
+
+    def update(self, tracking: bool, now: float) -> None:
+        self.frames += 1
+        if tracking:
+            self.tracked += 1
+            self._seen = True
+            if self._dropout_start is not None:
+                gap = now - self._dropout_start
+                self.longest_dropout = max(self.longest_dropout, gap)
+                self.short_dropouts += gap <= self.SHORT_GAP_SECONDS
+                self._dropout_start = None
+        elif self._seen and self._dropout_start is None:
+            self.dropouts += 1
+            self._dropout_start = now
+
+    def summary(self) -> str:
+        if not self.tracked:
+            return "never tracked"
+        # A dropout still open at the end is the player lowering their hand, so it is not counted as the longest.
+        return (f"tracked in {100 * self.tracked / self.frames:.0f}% of frames; hand went missing {self.dropouts} "
+                f"time(s), {self.short_dropouts} of them for {self.SHORT_GAP_SECONDS:g} s or less; "
+                f"longest gap {self.longest_dropout:.2f} s")
 
 
 class ZoneAssigner:
@@ -41,6 +80,8 @@ class ZoneAssigner:
             raise ValueError(f"Zones need 2 to {MAX_PLAYERS} players.")
         self.players = players
         self.settings = settings
+        # Hand-frames in which the line margin kept a hand with its player although it was across the line.
+        self.holds = 0
         self._last: dict[int, tuple[float, float, float]] = {}  # zone -> (x, y, time) of its last accepted hand
 
     def zone_of(self, x: float) -> int:
@@ -62,6 +103,7 @@ class ZoneAssigner:
             distance = math.hypot(x - last_x, y - last_y)
             if distance <= best_distance:
                 best, best_distance = zone, distance
+        self.holds += best != plain
         return best
 
     def assign(self, result: TrackingResult, now: float) -> TrackingResult:

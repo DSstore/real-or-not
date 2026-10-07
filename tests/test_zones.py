@@ -22,7 +22,7 @@ from cv_engine.models import (
 from cv_engine.position_processor import PositionProcessor
 from cv_engine.preview import draw_overlay
 from cv_engine.udp_sender import UdpSender, hand_state
-from cv_engine.zones import DETECTION_LIMIT, ZoneAssigner
+from cv_engine.zones import DETECTION_LIMIT, PlayerTally, ZoneAssigner
 from shared.config import ConfigurationError, ControlSettings, SenderSettings, TrackingSettings, load_settings
 from shared.protocol import CVState, ProtocolError, decode_cv_state
 from tests.gesture_fixtures import gesture_hand
@@ -115,6 +115,17 @@ class HysteresisTests(unittest.TestCase):
         self.assertEqual(["left", "right"], [h.hand for h in first.hands])
         self.assertEqual(["left", "right"], [h.hand for h in second.hands])
         self.assertEqual([0.52, 0.8], [h.landmarks[0].x for h in second.hands])
+
+    def test_holds_are_counted_only_when_the_margin_changed_the_answer(self) -> None:
+        self.owner(0.3, now=0.0)
+        self.assertEqual(0, self.zones.holds)   # not near the line
+        self.owner(0.52, now=0.05)
+        self.assertEqual(1, self.zones.holds)   # across the line, kept by the margin
+        self.owner(0.58, now=0.10)
+        self.assertEqual(1, self.zones.holds)   # clearly across: no hold
+        fresh = ZoneAssigner(2, SETTINGS)
+        fresh.assign(frame(hand(0.52)), 0.0)
+        self.assertEqual(0, fresh.holds)        # near the line with no history: the side decides, so no hold
 
     def test_hysteresis_can_be_turned_off(self) -> None:
         zones = ZoneAssigner(2, replace(SETTINGS, zone_hysteresis=0))
@@ -281,7 +292,8 @@ class ControllerTests(unittest.TestCase):
             settings = self.settings(receiver.getsockname()[1], TRACKING_PLAYERS="2")
             self.assertEqual(3, run_tracking(settings, show_preview=False, max_frames=3))
             packets = [decode_cv_state(receiver.recv(1201)) for _ in range(8)]  # 3 states + 1 final lost, per player
-        self.assertEqual(DETECTION_LIMIT, tracker_factory.call_args.args[0].max_hands)
+        self.assertEqual(2, DETECTION_LIMIT)  # one hand each: there is only room for two hands
+        self.assertEqual(2, tracker_factory.call_args.args[0].max_hands)
         by_slot = {slot: [p for p in packets if p.slot == slot] for slot in (0, 1)}
         self.assertEqual([4, 4], [len(by_slot[0]), len(by_slot[1])])
         self.assertEqual(1, len({p.stream_id for p in by_slot[0]}))
@@ -311,6 +323,34 @@ class ControllerTests(unittest.TestCase):
         self.assertTrue(all(b"slot" not in payload for payload in payloads))
         self.assertAlmostEqual(0.1, decode_cv_state(payloads[0]).position.x)  # not stretched: the old behaviour
 
+    @patch("cv_engine.controller.perf_counter", side_effect=[0, 0, 0.04, 0.08, 0.12, 0.16])
+    @patch("cv_engine.hand_tracker.HandTracker")
+    @patch("cv_engine.camera.Camera")
+    def test_the_run_summary_reports_each_player_separately(
+        self, camera_factory: MagicMock, tracker_factory: MagicMock, clock: MagicMock,
+    ) -> None:
+        camera_factory.return_value.__enter__.return_value.read.return_value = np.zeros((480, 640, 3), np.uint8)
+        both, only_first = frame(hand(0.1), hand(0.9)), frame(hand(0.1))
+        tracker_factory.return_value.__enter__.return_value.process.side_effect = [both, both, only_first, both]
+        with self.assertLogs("motionplay.cv_engine.controller", level="INFO") as logs:
+            run_tracking(self.settings(5005, TRACKING_PLAYERS="2"), show_preview=False, max_frames=4, send_udp=False)
+        text = "\n".join(logs.output)
+        self.assertIn("Player 1: tracked in 100% of frames; hand went missing 0 time(s), 0 of them for 0.5 s or less; longest gap 0.00 s.", text)
+        self.assertIn("Player 2: tracked in 75% of frames; hand went missing 1 time(s), 1 of them for 0.5 s or less; longest gap 0.04 s.", text)
+        self.assertIn("Zone line: the margin kept a hand with its player in 0 hand-frame(s).", text)
+
+    @patch("cv_engine.controller.perf_counter", side_effect=[0, 0, 0.04])
+    @patch("cv_engine.hand_tracker.HandTracker")
+    @patch("cv_engine.camera.Camera")
+    def test_one_player_mode_logs_no_per_player_summary(
+        self, camera_factory: MagicMock, tracker_factory: MagicMock, clock: MagicMock,
+    ) -> None:
+        camera_factory.return_value.__enter__.return_value.read.return_value = np.zeros((480, 640, 3), np.uint8)
+        tracker_factory.return_value.__enter__.return_value.process.return_value = frame(hand(0.1))
+        with self.assertLogs("motionplay.cv_engine.controller", level="INFO") as logs:
+            run_tracking(self.settings(5005), show_preview=False, max_frames=1, send_udp=False)
+        self.assertNotIn("Player 1", "\n".join(logs.output))
+
     @patch("cv_engine.preview.Preview")
     @patch("cv_engine.hand_tracker.HandTracker")
     @patch("cv_engine.camera.Camera")
@@ -326,6 +366,35 @@ class ControllerTests(unittest.TestCase):
         preview.show.side_effect = [False]
         run_tracking(self.settings(5005), send_udp=False)
         self.assertEqual({}, preview.show.call_args.kwargs)
+
+
+class PlayerTallyTests(unittest.TestCase):
+    def run_sequence(self, *steps: tuple[bool, float]) -> PlayerTally:
+        tally = PlayerTally()
+        for tracking, now in steps:
+            tally.update(tracking, now)
+        return tally
+
+    def test_dropouts_are_counted_only_after_the_hand_was_first_seen(self) -> None:
+        tally = self.run_sequence((False, 0.0), (False, 0.04), (True, 0.08), (True, 0.12), (False, 0.16),
+                                  (False, 0.20), (True, 0.24))
+        self.assertEqual((7, 3, 1), (tally.frames, tally.tracked, tally.dropouts))
+        self.assertAlmostEqual(0.08, tally.longest_dropout)
+        self.assertEqual("tracked in 43% of frames; hand went missing 1 time(s), 1 of them for 0.5 s or less; longest gap 0.08 s", tally.summary())
+
+    def test_the_longest_of_several_gaps_is_reported(self) -> None:
+        tally = self.run_sequence((True, 0.0), (False, 0.1), (True, 0.2), (False, 0.3), (False, 0.4), (True, 1.0))
+        self.assertEqual(2, tally.dropouts)
+        self.assertAlmostEqual(0.7, tally.longest_dropout)
+        self.assertEqual(1, tally.short_dropouts)  # the 0.1 s gap is short; the 0.7 s gap is not
+
+    def test_a_gap_still_open_at_the_end_is_not_a_longest_gap(self) -> None:
+        tally = self.run_sequence((True, 0.0), (False, 0.1), (False, 5.0))  # the player lowered their hand
+        self.assertEqual((1, 0.0), (tally.dropouts, tally.longest_dropout))
+
+    def test_a_player_who_never_appeared_says_so(self) -> None:
+        self.assertEqual("never tracked", self.run_sequence((False, 0.0), (False, 1.0)).summary())
+        self.assertEqual("never tracked", PlayerTally().summary())
 
 
 class PreviewTests(unittest.TestCase):

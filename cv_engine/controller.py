@@ -35,7 +35,7 @@ def run_tracking(
     from cv_engine.position_processor import PositionProcessor
     from cv_engine.preview import Preview
     from cv_engine.udp_sender import UdpSender
-    from cv_engine.zones import DETECTION_LIMIT, ZONE_LABELS, ZoneAssigner
+    from cv_engine.zones import DETECTION_LIMIT, ZONE_LABELS, PlayerTally, ZoneAssigner
 
     if max_frames is not None and max_frames < 1:
         raise ValueError("max_frames must be positive.")
@@ -44,6 +44,7 @@ def run_tracking(
     zones = ZoneAssigner(players, settings.control) if players > 1 else None
     tracking_settings = settings.tracking if zones is None else replace(
         settings.tracking, max_hands=max(settings.tracking.max_hands, DETECTION_LIMIT))
+    tallies = [PlayerTally() for _ in range(players)] if zones is not None else []
     with ExitStack() as stack:
         # Check the optional desktop preview before accessing the camera.
         preview = stack.enter_context(Preview()) if show_preview else None
@@ -89,6 +90,8 @@ def run_tracking(
                 gestures = gesture_processor.update(result, controls, now, frame.shape[1] / frame.shape[0])
                 # Each stream picks its own player's hand out of the same controls (see UdpSender).
                 outgoing = controls if zones is None else zones.output_controls(controls)
+                for slot, tally in enumerate(tallies):
+                    tally.update(any(item.hand == ZONE_LABELS[slot] and item.tracking for item in controls.hands), now)
                 for sender in senders:
                     sender.send(outgoing, gestures, now)
                 loop_fps = frame_count / max(now - started_at, 1e-9)
@@ -116,6 +119,10 @@ def run_tracking(
             LOGGER.info("Tracking finished after %d frame(s) in %.1f s (average %.1f FPS); hand lost %d time(s); "
                         "%d label correction(s).", frame_count, elapsed, frame_count / max(elapsed, 1e-9),
                         lost_events, continuity.corrections)
+            for slot, tally in enumerate(tallies):
+                LOGGER.info("Player %d: %s.", slot + 1, tally.summary())
+            if zones is not None:
+                LOGGER.info("Zone line: the margin kept a hand with its player in %d hand-frame(s).", zones.holds)
         return frame_count
 
 

@@ -38,7 +38,7 @@ The Python programs read every key except `UNITY_RECEIVE_TIMEOUT`. The Unity pro
 | `TRACKING_MODEL_COMPLEXITY` | `1` | 0 or 1 | `0` is the lighter model: about twice as fast (29 against 17 FPS headless on the test machine) with similar stability. `1` is the full model. |
 | `TRACKING_DETECTION_CONFIDENCE` | `0.6` | 0 to 1 | MediaPipe's threshold for detecting a new hand. |
 | `TRACKING_MIN_CONFIDENCE` | `0.6` | 0 to 1 | MediaPipe's threshold for continuing to track a hand. |
-| `TRACKING_PLAYERS` | `1` | 1 or 2 | `1` is the original one-player behaviour. `2` lets two people share the camera: the left half of the picture is player 1 and the right half is player 2, each with their own hand, smoothing, gestures and `CV_STATE` packets (a `slot` field, `0` or `1`). In this mode the engine looks for up to 4 hands so that a spare hand cannot hide a player's hand, keeps the most confident hand in each half, and does not use the label-flicker fix. `CONTROL_HAND` is ignored. |
+| `TRACKING_PLAYERS` | `1` | 1 or 2 | `1` is the original one-player behaviour. `2` lets two people share the camera: the left half of the picture is player 1 and the right half is player 2, each with their own hand, smoothing, gestures and `CV_STATE` packets (a `slot` field, `0` or `1`). In this mode the engine looks for at most 2 hands (one per person), keeps the most confident hand in each half, and does not use the label-flicker fix. Each person should use one hand: if one person raises a second hand, MediaPipe may report it instead of the other person's hand. `CONTROL_HAND` is ignored. |
 
 ## Palm control filtering
 
