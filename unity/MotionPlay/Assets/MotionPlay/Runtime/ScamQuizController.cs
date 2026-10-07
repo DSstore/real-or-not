@@ -543,7 +543,8 @@ namespace MotionPlay.Unity
         {
             string left = game.Phase == QuizPhase.Waiting ? "Scam Quiz"
                 : game.Phase == QuizPhase.Complete ? "Round complete   |   Level " + game.Level
-                : "Question " + (game.QuestionIndex + 1) + " of " + game.QuestionCount + "   |   Level " + game.Level;
+                : "Question " + (game.QuestionIndex + 1) + " of " + game.QuestionCount + "   |   Level " + game.Level +
+                  (game.CurrentQuestion.Category == QuestionBank.FinalCategory ? "   |   Challenge question" : "");
             Text(hudRect, left, size, TextAnchor.MiddleLeft, FontStyle.Bold, Ink);
             if (game.Phase == QuizPhase.Asking)
             {

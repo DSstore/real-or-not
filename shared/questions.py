@@ -22,6 +22,9 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_BANK_PATH = PROJECT_ROOT / "data" / "questions.json"
 DEFAULT_RECENT_PATH = PROJECT_ROOT / "data" / "recent_questions.json"
 
+# Questions about everyday digital skills (apps, payments, settings) rather than scams. A round's last question is one of
+# these, whatever the level, and no other question in a round is. See pick_round.
+FINAL_CATEGORY = "digital_skills"
 CATEGORIES = (
     # Scams
     "sms_phishing", "phone_scam", "email_phishing", "fake_website", "social_media_scam",
@@ -29,6 +32,7 @@ CATEGORIES = (
     # Staying safe and sensible online beyond scams
     "protect_personal_info", "misinformation", "genai", "messaging_safety", "banking_payments",
     "device_security", "digital_wellbeing", "singpass_services",
+    FINAL_CATEGORY,
 )
 MIN_DIFFICULTY, MAX_DIFFICULTY = 1, 5
 CHOICE_COUNT = 4  # Always four are written; the game shows fewer at low levels.
@@ -73,11 +77,17 @@ class QuestionBank:
         return next((q for q in self.questions if q.id == question_id), None)
 
     def difficulty_counts(self) -> dict[int, int]:
-        """Questions per difficulty, 1 to 5, including zeros."""
+        """Questions per difficulty, 1 to 5, including zeros. The final-question pool is left out: those questions are
+        only ever asked last, so they cannot fill the rest of a round at any level."""
         counts = {level: 0 for level in range(MIN_DIFFICULTY, MAX_DIFFICULTY + 1)}
         for question in self.questions:
-            counts[question.difficulty] += 1
+            if question.category != FINAL_CATEGORY:
+                counts[question.difficulty] += 1
         return counts
+
+    def final_count(self) -> int:
+        """How many questions can be asked last."""
+        return sum(1 for question in self.questions if question.category == FINAL_CATEGORY)
 
 
 def _is_int(value: object) -> bool:
@@ -179,10 +189,14 @@ def pick_round(bank: QuestionBank, level: int, count: int = ROUND_LENGTH, recent
                rng: random.Random | None = None) -> list[Question]:
     """Choose up to ``count`` different questions for a round at ``level`` (difficulty 1 to ``level``).
 
-    Each pick prefers, in order: a question not asked recently from a category not yet used this round; any question
-    not asked recently; a recent question from an unused category; any remaining question. So repeats and one-topic
-    rounds only happen when the pool is too small to avoid them. Fewer than ``count`` are returned only if fewer exist.
-    The result is ordered easiest first (ties keep their random order), so a round eases the players in.
+    If the bank has final-question pool questions (category ``FINAL_CATEGORY``), the last question of the round is one
+    of them, whatever the level, and the other ``count - 1`` come from the rest of the bank. The final question
+    prefers one not asked recently.
+
+    Each of the others prefers, in order: a question not asked recently from a category not yet used this round; any
+    question not asked recently; a recent question from an unused category; any remaining question. So repeats and
+    one-topic rounds only happen when the pool is too small to avoid them. Fewer than ``count`` are returned only if
+    fewer exist. Those others are ordered easiest first (ties keep their random order), so a round eases the players in.
     """
     if not (_is_int(level) and MIN_DIFFICULTY <= level <= MAX_DIFFICULTY):
         raise ValueError(f"level must be a whole number from {MIN_DIFFICULTY} to {MAX_DIFFICULTY}.")
@@ -190,10 +204,12 @@ def pick_round(bank: QuestionBank, level: int, count: int = ROUND_LENGTH, recent
         raise ValueError(f"count must be a whole number from 1 to {MAX_ROUND_LENGTH}.")
     rng = rng if rng is not None else random.Random()
     recent_ids = set(recent)
-    remaining = [q for q in bank.questions if q.difficulty <= level]
+    finals = [q for q in bank.questions if q.category == FINAL_CATEGORY]
+    regular_count = count - 1 if finals else count
+    remaining = [q for q in bank.questions if q.difficulty <= level and q.category != FINAL_CATEGORY]
     chosen: list[Question] = []
     used_categories: set[str] = set()
-    while remaining and len(chosen) < count:
+    while remaining and len(chosen) < regular_count:
         fresh = [q for q in remaining if q.id not in recent_ids]
         tiers = ([q for q in fresh if q.category not in used_categories], fresh,
                  [q for q in remaining if q.category not in used_categories], remaining)
@@ -202,6 +218,8 @@ def pick_round(bank: QuestionBank, level: int, count: int = ROUND_LENGTH, recent
         used_categories.add(pick.category)
         remaining.remove(pick)
     chosen.sort(key=lambda q: q.difficulty)
+    if finals:
+        chosen.append(rng.choice([q for q in finals if q.id not in recent_ids] or finals))
     return chosen
 
 

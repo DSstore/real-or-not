@@ -12,10 +12,11 @@ import unittest
 from pathlib import Path
 
 from shared import questions
-from shared.questions import (CATEGORIES, QuestionBank, QuestionBankError, coverage_shortfalls, load_bank, load_recent,
+from shared.questions import (CATEGORIES, FINAL_CATEGORY, QuestionBank, QuestionBankError, coverage_shortfalls, load_bank, load_recent,
                               parse_bank, pick_round, remember_round)
 from tools import validate_questions
 
+REGULAR = [category for category in CATEGORIES if category != FINAL_CATEGORY]  # topics for the other questions in a round
 SOURCE = questions.SOURCE_PREFIX + "learn/resources/all-resources/tips-for-adults-on-online-scams"
 
 
@@ -30,7 +31,7 @@ def raw_bank(*items: dict) -> dict:
 
 def big_bank() -> QuestionBank:
     """Five questions at every difficulty, spread over all nine categories."""
-    items = [raw_question(n, category=CATEGORIES[n % len(CATEGORIES)], difficulty=n % 5 + 1) for n in range(50)]
+    items = [raw_question(n, category=REGULAR[n % len(REGULAR)], difficulty=n % 5 + 1) for n in range(50)]
     return parse_bank(raw_bank(*items))
 
 
@@ -182,7 +183,7 @@ class PickRoundTests(unittest.TestCase):
         self.assertTrue({q.id for q in first}.isdisjoint(q.id for q in second))
 
     def test_recent_questions_are_used_when_the_pool_is_too_small(self) -> None:
-        bank = parse_bank(raw_bank(*[raw_question(n, category=CATEGORIES[n]) for n in range(6)]))
+        bank = parse_bank(raw_bank(*[raw_question(n, category=REGULAR[n]) for n in range(6)]))
         chosen = pick_round(bank, 1, recent=[f"q-{n}" for n in range(6)], rng=random.Random(2))
         self.assertEqual(5, len(chosen))  # all six are recent, so some must repeat rather than short-change the round
 
@@ -210,6 +211,83 @@ class PickRoundTests(unittest.TestCase):
         for count in (0, 21, False):
             with self.subTest(count=count), self.assertRaises(ValueError):
                 pick_round(bank, 3, count)  # type: ignore[arg-type]
+
+
+def bank_with_finals(finals: int = 6) -> QuestionBank:
+    """The 50 ordinary questions of ``big_bank`` plus some final-question pool questions (all very hard)."""
+    items = [raw_question(n, category=REGULAR[n % len(REGULAR)], difficulty=n % 5 + 1) for n in range(50)]
+    items += [raw_question(100 + n, category=FINAL_CATEGORY, difficulty=5) for n in range(finals)]
+    return parse_bank(raw_bank(*items))
+
+
+class FinalQuestionTests(unittest.TestCase):
+    """The last question of a round comes from the final-question pool, whatever the level."""
+
+    def test_the_last_question_is_from_the_pool_and_no_other_is(self) -> None:
+        bank = bank_with_finals()
+        for level in range(1, 6):
+            for seed in range(15):
+                chosen = pick_round(bank, level, rng=random.Random(seed * 7 + level))
+                self.assertEqual(5, len(chosen), (level, seed))
+                self.assertEqual(FINAL_CATEGORY, chosen[-1].category)
+                self.assertTrue(all(q.category != FINAL_CATEGORY for q in chosen[:-1]))
+                self.assertTrue(all(q.difficulty <= level for q in chosen[:-1]), "the others still follow the level")
+
+    def test_the_pool_ignores_the_level_even_at_the_easiest(self) -> None:
+        chosen = pick_round(bank_with_finals(), 1, rng=random.Random(4))
+        self.assertEqual(5, chosen[-1].difficulty)
+        self.assertEqual({1}, {q.difficulty for q in chosen[:-1]})
+
+    def test_the_others_are_still_easiest_first_and_spread_over_topics(self) -> None:
+        for seed in range(20):
+            others = pick_round(bank_with_finals(), 5, rng=random.Random(seed))[:-1]
+            self.assertEqual(sorted(q.difficulty for q in others), [q.difficulty for q in others])
+            self.assertEqual(4, len({q.category for q in others}))
+
+    def test_the_final_question_avoids_recently_asked_ones_while_others_exist(self) -> None:
+        bank = bank_with_finals(6)
+        finals = [q.id for q in bank.questions if q.category == FINAL_CATEGORY]
+        for seed in range(20):
+            chosen = pick_round(bank, 3, recent=finals[:5], rng=random.Random(seed))
+            self.assertEqual(finals[5], chosen[-1].id)
+        # With every one recent, it still picks one rather than leaving the round short.
+        self.assertEqual(FINAL_CATEGORY, pick_round(bank, 3, recent=finals, rng=random.Random(1))[-1].category)
+
+    def test_every_pool_question_can_come_up(self) -> None:
+        bank, seen, rng = bank_with_finals(6), set(), random.Random(3)
+        for _ in range(200):
+            seen.add(pick_round(bank, 2, rng=rng)[-1].id)
+        self.assertEqual({q.id for q in bank.questions if q.category == FINAL_CATEGORY}, seen)
+
+    def test_the_pool_does_not_count_towards_the_per_difficulty_coverage(self) -> None:
+        bank = bank_with_finals(20)
+        self.assertEqual({d: 10 for d in range(1, 6)}, bank.difficulty_counts())
+        self.assertEqual({}, coverage_shortfalls(bank, 10))
+        self.assertEqual(20, bank.final_count())
+
+    def test_a_round_of_one_is_just_the_final_question(self) -> None:
+        chosen = pick_round(bank_with_finals(), 3, count=1, rng=random.Random(2))
+        self.assertEqual([FINAL_CATEGORY], [q.category for q in chosen])
+
+    def test_a_bank_without_a_pool_behaves_as_before(self) -> None:
+        chosen = pick_round(big_bank(), 5, rng=random.Random(1))
+        self.assertEqual(5, len(chosen))
+        self.assertTrue(all(q.category != FINAL_CATEGORY for q in chosen))
+        self.assertEqual(0, big_bank().final_count())
+
+    def test_the_shipped_bank_has_a_pool_and_every_round_ends_with_it(self) -> None:
+        bank = load_bank()
+        self.assertGreaterEqual(bank.final_count(), 20)
+        for level in range(1, 6):
+            chosen = pick_round(bank, level, rng=random.Random(level))
+            self.assertEqual(5, len(chosen))
+            self.assertEqual(FINAL_CATEGORY, chosen[-1].category)
+
+    def test_the_validator_reports_the_pool(self) -> None:
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            self.assertEqual(0, validate_questions.main(["--strict"]))
+        self.assertIn("final-question pool (digital_skills): ", out.getvalue())
 
 
 class RecentQuestionTests(unittest.TestCase):
@@ -273,7 +351,7 @@ class ValidatorToolTests(unittest.TestCase):
 
     def test_a_complete_bank_passes_strict(self) -> None:
         code, output = self.run_tool(copy.deepcopy({"version": 1, "questions": [
-            raw_question(n, category=CATEGORIES[n % 9], difficulty=n % 5 + 1) for n in range(50)]}), "--strict")
+            raw_question(n, category=REGULAR[n % 9], difficulty=n % 5 + 1) for n in range(50)]}), "--strict")
         self.assertEqual(0, code, output)
 
     def test_an_invalid_bank_lists_every_problem_and_fails(self) -> None:

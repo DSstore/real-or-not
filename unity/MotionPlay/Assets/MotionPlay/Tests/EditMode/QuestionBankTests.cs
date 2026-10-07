@@ -14,7 +14,8 @@ namespace MotionPlay.Tests
         /// A bank with <paramref name="perDifficulty"/> questions at each of difficulties 1 to 5, spread over
         /// <paramref name="categories"/> categories. The right answer sits at a different position in each question.
         /// </summary>
-        public static string BankJson(int perDifficulty = 4, int categories = 5, int extraExplanationCharacters = 0)
+        public static string BankJson(int perDifficulty = 4, int categories = 5, int extraExplanationCharacters = 0,
+            int finalQuestions = 0)
         {
             var text = new StringBuilder("{\"version\":1,\"questions\":[");
             int number = 0;
@@ -31,11 +32,25 @@ namespace MotionPlay.Tests
                                 "\"],\"correct\":" + correct + ",\"explanation\":\"Because " + id + "." + new string('x', extraExplanationCharacters) + "\"," +
                                 "\"source\":\"https://www.digitalforlife.gov.sg/page-" + id + "\"}");
                 }
+            // The final-question pool: very hard everyday-skills questions that are only ever asked last.
+            for (int n = 0; n < finalQuestions; n++, number++)
+            {
+                string id = "final-" + n;
+                int correct = number % 4;
+                var choices = new string[4];
+                for (int c = 0; c < 4; c++) choices[c] = c == correct ? "right " + id : "wrong " + c + " " + id;
+                if (number > 0) text.Append(',');
+                text.Append("{\"id\":\"" + id + "\",\"category\":\"" + QuestionBank.FinalCategory + "\",\"difficulty\":5" +
+                            ",\"question\":\"Question " + id + "?\",\"choices\":[\"" + string.Join("\",\"", choices) +
+                            "\"],\"correct\":" + correct + ",\"explanation\":\"Because " + id + ".\"," +
+                            "\"source\":\"https://www.digitalforlife.gov.sg/page-" + id + "\"}");
+            }
             return text.Append("]}").ToString();
         }
 
-        public static QuestionBank Bank(int perDifficulty = 4, int categories = 5, int extraExplanationCharacters = 0) =>
-            QuestionBank.Parse(BankJson(perDifficulty, categories, extraExplanationCharacters));
+        public static QuestionBank Bank(int perDifficulty = 4, int categories = 5, int extraExplanationCharacters = 0,
+            int finalQuestions = 0) =>
+            QuestionBank.Parse(BankJson(perDifficulty, categories, extraExplanationCharacters, finalQuestions));
 
         /// <summary>The real question file, found by walking up from the working folder; null if it is not there.</summary>
         public static string FindShippedBank()
@@ -120,9 +135,10 @@ namespace MotionPlay.Tests
             Assert.GreaterOrEqual(bank.Questions.Count, 50);
             for (int level = 1; level <= 5; level++)
             {
-                int atLevel = bank.Questions.Count(q => q.Difficulty == level);
-                Assert.GreaterOrEqual(atLevel, 10, "difficulty " + level + " needs at least 10 questions");
+                int atLevel = bank.Questions.Count(q => q.Difficulty == level && q.Category != QuestionBank.FinalCategory);
+                Assert.GreaterOrEqual(atLevel, 10, "difficulty " + level + " needs at least 10 ordinary questions");
             }
+            Assert.GreaterOrEqual(bank.FinalCount, 20, "the last-question pool");
             Assert.AreEqual(bank.Questions.Count, bank.Questions.Select(q => q.Id).Distinct().Count());
             // The easiest level must be able to fill a round, with some left over so rounds do not repeat at once.
             Assert.GreaterOrEqual(bank.CountAtOrBelow(1), 10);
@@ -207,6 +223,90 @@ namespace MotionPlay.Tests
             for (int i = 0; i < 400; i++)
                 foreach (QuizQuestion q in QuizPicker.Pick(Big, 5, 5, null, random)) seen.Add(q.Id);
             Assert.AreEqual(Big.Questions.Count, seen.Count);
+        }
+
+        private static readonly QuestionBank WithFinals = QuizFixture.Bank(perDifficulty: 6, categories: 7, finalQuestions: 6);
+
+        [Test]
+        public void TheLastQuestionIsFromTheFinalPoolAndNoOtherIs()
+        {
+            for (int level = 1; level <= 5; level++)
+                for (int seed = 0; seed < 15; seed++)
+                {
+                    var round = QuizPicker.Pick(WithFinals, level, 5, null, new Random(seed * 7 + level));
+                    Assert.AreEqual(5, round.Count, "level " + level);
+                    Assert.AreEqual(QuestionBank.FinalCategory, round[4].Category);
+                    Assert.IsTrue(round.Take(4).All(q => q.Category != QuestionBank.FinalCategory));
+                    Assert.IsTrue(round.Take(4).All(q => q.Difficulty <= level), "the others still follow the level");
+                }
+        }
+
+        [Test]
+        public void TheFinalQuestionIgnoresTheLevelButTheOthersDoNot()
+        {
+            var round = QuizPicker.Pick(WithFinals, 1, 5, null, new Random(4));
+            Assert.AreEqual(5, round[4].Difficulty);
+            CollectionAssert.AreEqual(new[] { 1, 1, 1, 1 }, round.Take(4).Select(q => q.Difficulty).ToArray());
+        }
+
+        [Test]
+        public void TheOthersAreEasiestFirstAndSpreadOverTopics()
+        {
+            for (int seed = 0; seed < 20; seed++)
+            {
+                var others = QuizPicker.Pick(WithFinals, 5, 5, null, new Random(seed)).Take(4).ToList();
+                CollectionAssert.AreEqual(others.Select(q => q.Difficulty).OrderBy(d => d).ToArray(), others.Select(q => q.Difficulty).ToArray());
+                Assert.AreEqual(4, others.Select(q => q.Category).Distinct().Count());
+            }
+        }
+
+        [Test]
+        public void TheFinalQuestionAvoidsRecentOnesWhileOthersExist()
+        {
+            var finals = WithFinals.Questions.Where(q => q.Category == QuestionBank.FinalCategory).Select(q => q.Id).ToList();
+            for (int seed = 0; seed < 20; seed++)
+                Assert.AreEqual(finals[5], QuizPicker.Pick(WithFinals, 3, 5, finals.Take(5), new Random(seed))[4].Id);
+            Assert.AreEqual(QuestionBank.FinalCategory, QuizPicker.Pick(WithFinals, 3, 5, finals, new Random(1))[4].Category);
+        }
+
+        [Test]
+        public void EveryFinalQuestionCanComeUp()
+        {
+            var seen = new System.Collections.Generic.HashSet<string>();
+            var random = new Random(3);
+            for (int i = 0; i < 200; i++) seen.Add(QuizPicker.Pick(WithFinals, 2, 5, null, random)[4].Id);
+            Assert.AreEqual(6, seen.Count);
+        }
+
+        [Test]
+        public void TheFinalPoolDoesNotCountTowardsWhatFillsARound()
+        {
+            Assert.AreEqual(6, WithFinals.FinalCount);
+            Assert.AreEqual(6, WithFinals.CountAtOrBelow(1));
+            Assert.AreEqual(30, WithFinals.CountAtOrBelow(5));
+            Assert.AreEqual(0, Big.FinalCount);
+        }
+
+        [Test]
+        public void ARoundOfOneIsJustTheFinalQuestion()
+        {
+            var round = QuizPicker.Pick(WithFinals, 3, 1, null, new Random(2));
+            Assert.AreEqual(1, round.Count);
+            Assert.AreEqual(QuestionBank.FinalCategory, round[0].Category);
+        }
+
+        [Test]
+        public void TheShippedBankEndsEveryRoundWithAFinalQuestion()
+        {
+            string path = QuizFixture.FindShippedBank();
+            if (path == null) Assert.Ignore("data/questions.json is not reachable from here.");
+            QuestionBank bank = QuestionBank.Parse(System.IO.File.ReadAllText(path));
+            for (int level = 1; level <= 5; level++)
+            {
+                var round = QuizPicker.Pick(bank, level, 5, null, new Random(level));
+                Assert.AreEqual(5, round.Count);
+                Assert.AreEqual(QuestionBank.FinalCategory, round[4].Category);
+            }
         }
 
         [Test]

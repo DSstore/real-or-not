@@ -13,8 +13,8 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from shared.questions import (DEFAULT_BANK_PATH, MIN_PER_DIFFICULTY, QuestionBankError, coverage_shortfalls,
-                              load_bank)
+from shared.questions import (DEFAULT_BANK_PATH, FINAL_CATEGORY, MIN_PER_DIFFICULTY, QuestionBankError,
+                              coverage_shortfalls, load_bank)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -36,6 +36,7 @@ def main(argv: list[str] | None = None) -> int:
     counts = bank.difficulty_counts()
     print(f"{args.file}: {len(bank.questions)} questions, version {bank.version}.")
     print("  per difficulty: " + ", ".join(f"{level}: {count}" for level, count in counts.items()))
+    print(f"  final-question pool ({FINAL_CATEGORY}): {bank.final_count()}")
     shortfalls = coverage_shortfalls(bank, args.min_per_difficulty)
     if shortfalls:
         needs = ", ".join(f"difficulty {level} needs {more} more" for level, more in shortfalls.items())

@@ -49,6 +49,11 @@ namespace MotionPlay.Games
         public const int ChoiceCount = 4;
         public const int MinDifficulty = 1;
         public const int MaxDifficulty = 5;
+        /// <summary>
+        /// Questions about everyday digital skills rather than scams. The last question of a round is one of these,
+        /// whatever the level, and no other question in a round is (see <see cref="QuizPicker"/>).
+        /// </summary>
+        public const string FinalCategory = "digital_skills";
 
         public int Version { get; }
         public IReadOnlyList<QuizQuestion> Questions { get; }
@@ -58,8 +63,15 @@ namespace MotionPlay.Games
             Version = version; Questions = questions.AsReadOnly();
         }
 
-        /// <summary>Questions whose difficulty is at most <paramref name="difficulty"/>.</summary>
-        public int CountAtOrBelow(int difficulty) => Questions.Count(question => question.Difficulty <= difficulty);
+        /// <summary>
+        /// Questions that can fill a round at this level: difficulty at most <paramref name="difficulty"/>, not counting the
+        /// final-question pool, which is only ever asked last.
+        /// </summary>
+        public int CountAtOrBelow(int difficulty) =>
+            Questions.Count(question => question.Difficulty <= difficulty && question.Category != FinalCategory);
+
+        /// <summary>How many questions can be asked last.</summary>
+        public int FinalCount => Questions.Count(question => question.Category == FinalCategory);
 
         public static QuestionBank Parse(string json)
         {
@@ -153,7 +165,9 @@ namespace MotionPlay.Games
     /// <summary>
     /// Chooses the questions for one round, with the same rules as pick_round in shared/questions.py: only questions
     /// up to the level's difficulty, none twice, a new category where possible, questions asked recently last, and
-    /// the easiest first. Fewer than the requested count come back only if fewer exist.
+    /// the easiest first. If the bank has a final-question pool, the last question is one of those whatever the level
+    /// (preferring one not asked recently) and the others come from the rest of the bank. Fewer than the requested
+    /// count come back only if fewer exist.
     /// </summary>
     public static class QuizPicker
     {
@@ -169,10 +183,13 @@ namespace MotionPlay.Games
             if (count < 1 || count > MaxRoundLength) throw new ArgumentOutOfRangeException(nameof(count));
 
             var recentIds = new HashSet<string>(recent ?? Enumerable.Empty<string>());
-            var remaining = bank.Questions.Where(question => question.Difficulty <= level).ToList();
+            List<QuizQuestion> finals = bank.Questions.Where(question => question.Category == QuestionBank.FinalCategory).ToList();
+            int regularCount = finals.Count > 0 ? count - 1 : count;
+            var remaining = bank.Questions
+                .Where(question => question.Difficulty <= level && question.Category != QuestionBank.FinalCategory).ToList();
             var chosen = new List<QuizQuestion>();
             var usedCategories = new HashSet<string>();
-            while (remaining.Count > 0 && chosen.Count < count)
+            while (remaining.Count > 0 && chosen.Count < regularCount)
             {
                 List<QuizQuestion> fresh = remaining.Where(question => !recentIds.Contains(question.Id)).ToList();
                 List<QuizQuestion> pool = fresh.Where(question => !usedCategories.Contains(question.Category)).ToList();
@@ -185,7 +202,14 @@ namespace MotionPlay.Games
                 remaining.Remove(pick);
             }
             // OrderBy is stable, so questions of equal difficulty keep their random order.
-            return chosen.OrderBy(question => question.Difficulty).ToList().AsReadOnly();
+            List<QuizQuestion> ordered = chosen.OrderBy(question => question.Difficulty).ToList();
+            if (finals.Count > 0)
+            {
+                List<QuizQuestion> freshFinals = finals.Where(question => !recentIds.Contains(question.Id)).ToList();
+                if (freshFinals.Count == 0) freshFinals = finals;
+                ordered.Add(freshFinals[random.Next(freshFinals.Count)]);
+            }
+            return ordered.AsReadOnly();
         }
     }
 

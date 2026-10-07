@@ -88,6 +88,37 @@ namespace MotionPlay.Tests
     {
         private const double Frame = QuizDriver.Frame;
 
+        // ---- the last question --------------------------------------------------------------------------
+
+        [Test]
+        public void TheLastQuestionOfARoundIsAFinalQuestionAtEveryLevel()
+        {
+            QuestionBank bank = QuizFixture.Bank(perDifficulty: 6, finalQuestions: 6);
+            for (int level = 1; level <= 5; level++)
+            {
+                ScamQuizGame game = QuizDriver.NewGame(level, seed: level, bank: bank);
+                game.Step(Frame, QuizDriver.Hands(true, true));
+                Assert.AreEqual(5, game.QuestionCount);
+                var asked = new System.Collections.Generic.List<QuizQuestion>();
+                while (game.Phase != QuizPhase.Complete)
+                {
+                    if (game.Phase == QuizPhase.Asking) { asked.Add(game.CurrentQuestion); QuizDriver.ChooseBoth(game, true, true); }
+                    QuizDriver.FinishFeedback(game);
+                }
+                Assert.AreEqual(5, asked.Count, "level " + level);
+                Assert.AreEqual(QuestionBank.FinalCategory, asked[4].Category);
+                Assert.IsTrue(asked.Take(4).All(q => q.Category != QuestionBank.FinalCategory));
+            }
+        }
+
+        [Test]
+        public void ABankMadeOnlyOfFinalQuestionsCannotStartARound()
+        {
+            string onlyFinals = QuizFixture.BankJson(perDifficulty: 0, finalQuestions: 3);
+            Assert.Throws<InvalidOperationException>(() =>
+                new ScamQuizGame(QuestionBank.Parse(onlyFinals), ScamQuizDifficulty.SettingsFor(1), 1));
+        }
+
         // ---- joining ----------------------------------------------------------------------------------
 
         [Test]

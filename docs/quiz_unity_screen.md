@@ -5,8 +5,11 @@ C# harness; the drawing, layout and scene setup have been compiled but never loo
 sizes and spacing after the first play.
 
 Two people (or one) stand in front of the camera and each move their own coloured cursor with a hand. They see the same
-question and hold their cursor on an answer to choose it. A round is five questions picked at random from the question
-bank (`data/questions.json`).
+question and hold their cursor on an answer to choose it. A round is five questions from the question bank
+(`data/questions.json`): four picked at random from the scam and online-safety topics, then a **challenge question** from
+a separate pool of 20 harder questions about everyday digital skills (HealthHub, Singpass, PayNow, SimplyGo, Zoom and
+so on). The challenge question is always last and is shown whatever the level; the screen says "Challenge question" in
+the top bar.
 
 ## Running it
 
@@ -52,7 +55,7 @@ hard for the pair together (combined score at least 90% with quick answers, or a
 | 4 | 12 s | 4 | 4 | 0.7 s |
 | 5 | 10 s | 4 | 5 | 0.6 s |
 
-With fewer than four answers shown, the right answer is always among them, plus randomly chosen wrong ones, in a random
+The level sets the difficulty of the first four questions only. With fewer than four answers shown, the right answer is always among them, plus randomly chosen wrong ones, in a random
 order. Questions asked in the last three rounds are avoided while there are others to pick from, and each round's
 questions are spread over different topics where possible.
 

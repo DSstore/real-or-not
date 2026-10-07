@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 5,
   "questions": [
     {
       "id": "sms-01",
@@ -7,10 +7,10 @@
       "difficulty": 1,
       "question": "You get an SMS: \"Congratulations! You won a prize. Tap this link and enter your card details to claim it.\" What should you do?",
       "choices": [
-        "Tap the link to see what the prize is",
-        "Do not tap the link. Delete the message",
-        "Enter your card details, as they say it is free",
-        "Reply to ask how to claim the prize"
+        "Tap the link to see the prize, but do not type anything",
+        "Do not tap the link. Delete the message, and do not reply",
+        "Reply to the sender and ask how to claim the prize",
+        "Tap the link and enter your details only if there is a padlock"
       ],
       "correct": 1,
       "explanation": "Scam messages often promise a prize and ask you to act quickly. They want your money or personal details. Do not tap links in prize messages, and do not reply. You can report suspicious messages to the CheckMate WhatsApp bot.",
@@ -23,9 +23,9 @@
       "question": "A caller says he is a police officer and tells you to move your savings to a \"safe account\" today. What should you do?",
       "choices": [
         "Hang up. Call the organisation yourself using its official number",
-        "Move the money, because the police said so",
-        "Give him your bank details so he can check",
-        "Keep him on the line while you do what he says"
+        "Move the money as asked, then check with the police afterwards",
+        "Give him your bank details so that he can check your account is safe",
+        "Stay on the line and do exactly what he says until he is finished"
       ],
       "correct": 0,
       "explanation": "Real officials will not tell you to transfer money to another account. Scammers use fear and urgency to rush you. Stop talking, hang up, and check by calling the official number you look up yourself. In an emergency, call 999.",
@@ -37,9 +37,9 @@
       "difficulty": 1,
       "question": "A caller says he is from your bank and asks you to read out the OTP sent to your phone. What should you do?",
       "choices": [
-        "Read it out, because he is from the bank",
-        "Read out only half of the digits",
-        "Send it to him by SMS instead",
+        "Read it out, because he is calling from the bank",
+        "Read out only the first three digits to prove who you are",
+        "Send it by SMS instead, so that it cannot be overheard",
         "Never share it. Hang up and contact your bank yourself"
       ],
       "correct": 3,
@@ -52,10 +52,10 @@
       "difficulty": 1,
       "question": "A post says: \"Win a free phone! Share this post and send us your NRIC and card details.\" What should you do?",
       "choices": [
-        "Send your details before the prize runs out",
-        "Send only your NRIC, not the card details",
+        "Send only your NRIC, and keep your card details to yourself",
+        "Share the post first, then send your details to claim the prize",
         "Ignore it. Do not share it or send any details",
-        "Share it so your friends can win too"
+        "Send your details quickly before the prize runs out"
       ],
       "correct": 2,
       "explanation": "Contests that ask for a lot of personal data are a warning sign. Your NRIC and card details are what criminals use for scams and fraud. Do not share the post or give any personal information.",
@@ -67,10 +67,10 @@
       "difficulty": 1,
       "question": "A stranger messages you on WhatsApp: \"I sent a 6-digit WhatsApp code to your number by mistake. Please send it to me.\" What should you do?",
       "choices": [
-        "Send it, to be helpful",
+        "Send it, then delete the chat so nobody else can see the code",
         "Do not share the code. Scammers use it to take over your account",
-        "Send it, but only if they say please",
-        "Send it, then delete the chat"
+        "Send it, because the message says it was sent to you by mistake",
+        "Send it only after asking the stranger for their name"
       ],
       "correct": 1,
       "explanation": "Scammers ask for the 6-digit code that WhatsApp sends to you, so they can log in as you and cheat your contacts. Never share this code with anyone. Turn on two-step verification for extra protection.",
@@ -82,10 +82,10 @@
       "difficulty": 1,
       "question": "A message offers you $300 a day for a few easy online tasks, but you must first pay a \"refundable\" deposit. What should you do?",
       "choices": [
-        "Do not pay. High pay for little effort and a deposit up front are warning signs",
-        "Pay the deposit, since it is refundable",
-        "Pay a smaller deposit to test it",
-        "Ask your friends to join and pay too"
+        "Do not pay. High pay for little work and a deposit up front are warning signs",
+        "Pay a small part of the deposit first, to see if the job is real",
+        "Pay the deposit, because it is refundable and you will get it back later",
+        "Ask the sender for proof of the company first, then pay the deposit if it looks real"
       ],
       "correct": 0,
       "explanation": "Scammers dangle fast money, then ask for a deposit first. Be wary of unsolicited job offers with high pay for little effort, and do not pay to get a job. You can read more scam advice at scamalert.sg.",
@@ -97,9 +97,9 @@
       "difficulty": 1,
       "question": "You get a WhatsApp message from an unknown number: \"Instant loan, no interest! Pay a small admin fee first.\" What should you do?",
       "choices": [
-        "Pay the small fee, since it is small",
-        "Reply with your NRIC to apply",
-        "Share your Singpass details so they can check you",
+        "Reply with your NRIC to see how much you can borrow",
+        "Pay the small admin fee, because the loan has no interest",
+        "Send your Singpass details so they can check you quickly",
         "Ignore it, block the number and report it as spam"
       ],
       "correct": 3,
@@ -112,10 +112,10 @@
       "difficulty": 1,
       "question": "A friend forwards you a shocking message that says \"Share with everyone now!\" You have not checked if it is true. What should you do?",
       "choices": [
-        "Forward it quickly in case it is true",
-        "Forward it, but only to family",
+        "Forward it to family only, in case the news is true",
+        "Forward it with a note saying you are not sure it is true",
         "Do not forward it. Check it first against reliable sources",
-        "Believe it, because a friend sent it"
+        "Believe it, because a friend you trust sent it to you"
       ],
       "correct": 2,
       "explanation": "Fake news spreads when people share before checking. Be sceptical of dramatic headlines and check with other reliable sources. You can also tell the friend who sent it that it may not be true.",
@@ -127,10 +127,10 @@
       "difficulty": 1,
       "question": "An AI chatbot gives you a confident answer about a health or money question. What is the wise thing to do?",
       "choices": [
-        "Trust it, because it sounded sure",
+        "Trust it, because the answer was long and gave many details",
         "Check important facts with a reliable source before acting",
-        "Trust it, because it is a computer",
-        "Trust it if the answer is long"
+        "Trust it, because computers do not make mistakes",
+        "Trust it if the chatbot says it is sure and gives a reason"
       ],
       "correct": 1,
       "explanation": "Generative AI can state false or outdated things very confidently. This is called hallucination. Check important facts, especially about health, money or legal matters, with reliable sources, and stay in charge of the decision yourself.",
@@ -143,9 +143,9 @@
       "question": "Your phone has no lock, so anyone who picks it up can open it. What is the best fix?",
       "choices": [
         "Set a screen lock with a PIN, pattern, face or fingerprint",
-        "Keep the screen brightness low",
-        "Turn the phone off when you are not using it",
-        "Hide the phone icon on your home screen"
+        "Keep the screen brightness low so others cannot read it",
+        "Turn the phone off every time you put it down for a while",
+        "Hide the phone icons so that nobody can find your apps"
       ],
       "correct": 0,
       "explanation": "A screen lock stops other people from opening your phone, apps and messages if it is lost or stolen. Choose a PIN, pattern, face or fingerprint that others cannot easily guess.",
@@ -157,9 +157,9 @@
       "difficulty": 1,
       "question": "You want a new app on your phone. Where is the safest place to download it?",
       "choices": [
-        "A link sent to you in an SMS",
-        "A website that offers it free",
-        "A link from a stranger in a chat group",
+        "A link sent in an SMS, if the sender is a friend of yours",
+        "A website that offers the app for free, with no sign-in needed",
+        "A link a stranger posted in a chat group about the app",
         "The official app store: Apple App Store or Google Play Store"
       ],
       "correct": 3,
@@ -172,10 +172,10 @@
       "difficulty": 1,
       "question": "You keep scrolling through bad news online and now feel worried and low. What should you do?",
       "choices": [
-        "Keep scrolling until you find good news",
-        "Scroll faster to finish it all",
+        "Keep scrolling until you find some good news to read",
+        "Turn on more news notifications so that you stay updated",
         "Put the phone down, take a break and talk to someone",
-        "Turn on more notifications to stay updated"
+        "Scroll faster so you finish all the bad news sooner"
       ],
       "correct": 2,
       "explanation": "Endless scrolling of bad news can raise stress and anxiety. Decide what you want to see before you go online, use a timer, and stop when you feel low. Talk to someone if it affects your mood.",
@@ -187,10 +187,10 @@
       "difficulty": 2,
       "question": "A caller says a parcel in your name was held by customs and you must pay a fine now, or you will be in trouble. What should you do?",
       "choices": [
-        "Pay quickly to avoid trouble",
+        "Pay the fine quickly, then ask for a receipt afterwards",
         "Hang up. Do not pay, and check with the real organisation yourself",
-        "Give your NRIC so they can find the parcel",
-        "Press 1 to speak to an officer"
+        "Press 1 to speak to an officer and ask them to prove it",
+        "Give your NRIC so they can find the parcel in their records"
       ],
       "correct": 1,
       "explanation": "Scammers pretend a parcel was held or that you broke a law, then demand money or personal details. Hang up, and contact the real organisation using an official number you look up yourself.",
@@ -203,9 +203,9 @@
       "question": "You have chatted online for two months with someone you have never met. They suddenly ask you to send money urgently. What should you do?",
       "choices": [
         "Do not send money. Talk to a family member or friend you trust",
-        "Send the money, since you have talked for so long",
-        "Send a small amount first to test them",
-        "Ask them to send a photo, then send the money"
+        "Send a small amount first, to test if they are honest",
+        "Send the money, because you have known them for two months",
+        "Ask for a photo of them, and send the money if it looks real"
       ],
       "correct": 0,
       "explanation": "Be wary of unsolicited friend requests and of urgent money requests from someone you only know online. Scammers build trust first, then ask for money. Talk to someone you trust, and read more at scamalert.sg.",
@@ -217,9 +217,9 @@
       "difficulty": 2,
       "question": "You are buying online. The seller says: \"Skip the app's payment. Pay by direct bank transfer to get a discount.\" What should you do?",
       "choices": [
-        "Pay by bank transfer to save money",
-        "Pay half now and half later",
-        "Pay, then report if the item does not arrive",
+        "Agree to the transfer, but pay only half of the price first",
+        "Pay by bank transfer, and report the seller if the item does not arrive",
+        "Pay by bank transfer, because the discount is a good deal",
         "Say no. Pay only through the platform's own payment system"
       ],
       "correct": 3,
@@ -232,10 +232,10 @@
       "difficulty": 2,
       "question": "A WhatsApp group promises \"guaranteed 30% profit every month, no risk\". What is the safest choice?",
       "choices": [
-        "Join with a small amount to try it",
-        "Join, because many members show profits",
+        "Join with a small amount first, to see if the profits are real",
+        "Join, because so many members are showing their profits",
         "Stay away. An offer that sounds too good to be true is a warning sign",
-        "Ask the group admin if it is safe"
+        "Ask the group admin whether the offer is safe, then decide"
       ],
       "correct": 2,
       "explanation": "Scams often use offers that are too good to be true and pressure you to act fast. Slow down, ask a trusted family member, and contact the company only through its official contact details.",
@@ -247,10 +247,10 @@
       "difficulty": 2,
       "question": "An email says: \"Your account will close in 24 hours. Click here to confirm your card details.\" You cannot tell who sent it. What should you do?",
       "choices": [
-        "Click the link and confirm your details",
-        "Do not reply or click. Check with the organisation through its official website or hotline",
-        "Reply and ask them to explain",
-        "Open the attachment to read more"
+        "Click the link, but check that the web address starts with https",
+        "Do not click. Contact the organisation through its official website",
+        "Reply to the email and ask them to confirm it is real",
+        "Open the attachment first, to read more about the problem"
       ],
       "correct": 1,
       "explanation": "A message that asks you to confirm card details on a link is a phishing sign. If you cannot confirm who sent a message, do not reply or click. Contact the organisation yourself through its official website or hotline.",
@@ -263,9 +263,9 @@
       "question": "Your banking app shows a request to approve a transaction that you did not make. What should you do?",
       "choices": [
         "Tap Reject, and tell your bank if you are worried",
-        "Approve it, in case it is a bank test",
-        "Ignore it and do nothing",
-        "Approve it and check later"
+        "Approve it, in case the bank is testing the app",
+        "Ignore the request and wait to see if it comes up again",
+        "Approve it, then check your account for the payment later"
       ],
       "correct": 0,
       "explanation": "Always check every transaction before you approve it in your banking app. If it is not yours, tap Reject. Scammers may try to get you to approve something that moves your money.",
@@ -277,9 +277,9 @@
       "difficulty": 2,
       "question": "You get an SMS that says it is from the government. How can you check that it is real?",
       "choices": [
-        "Check if the message has your name in it",
-        "Check if it has a link you can tap",
-        "Check if it says it is urgent",
+        "Check that the SMS uses your full name and NRIC number",
+        "Check that the link in the SMS works when you tap it",
+        "Check that the SMS says it is urgent and gives a deadline",
         "Look at the sender name. Real government SMSes come from \"gov.sg\""
       ],
       "correct": 3,
@@ -292,10 +292,10 @@
       "difficulty": 2,
       "question": "A news story with a dramatic headline appears on only one website, which has no About or Contact page. What should you do?",
       "choices": [
-        "Believe it, because it is online",
-        "Share it first, then check",
+        "Believe it, because the story is well written and full of detail",
+        "Share it with your friends first, and check whether it is true later",
         "Be careful. Check whether other reliable sources report the same story",
-        "Trust it if it has many words"
+        "Trust it, because it already has so many readers and comments online"
       ],
       "correct": 2,
       "explanation": "Warning signs of fake news include dramatic headlines, poor spelling or grammar, no About or Contact page, and a story that appears on only one site. Check other reliable sources, or a fact-checker such as gov.sg/factually, before you believe or share it.",
@@ -307,10 +307,10 @@
       "difficulty": 2,
       "question": "An AI chatbot asks for your full name, address and bank details \"to help you better\". What should you do?",
       "choices": [
-        "Share them, since it is only a computer",
+        "Share your address only, and keep your bank details to yourself",
         "Do not share them. Avoid giving AI tools personal or financial details",
-        "Share your address but not the bank details",
-        "Share them if the chatbot says please"
+        "Share them, because chatbots keep everything you tell them private",
+        "Share them if the chatbot promises to delete them straight afterwards"
       ],
       "correct": 1,
       "explanation": "Do not share sensitive details such as your full name, address, phone number or financial information with AI tools. Answers about health, money or law should also be double-checked.",
@@ -322,10 +322,10 @@
       "difficulty": 2,
       "question": "You turn on two-step verification in WhatsApp. What does it add?",
       "choices": [
-        "A PIN that adds protection to your account",
-        "A way to see who read your messages",
-        "A faster way to send photos",
-        "Free calls overseas"
+        "A PIN that adds extra protection to your WhatsApp account",
+        "A list showing who has read all of your messages",
+        "A daily backup of all your chats to the cloud",
+        "A faster way to send photos and large files to others"
       ],
       "correct": 0,
       "explanation": "Two-step verification adds a PIN to your WhatsApp account. You turn it on in Settings, then Account, then Two-step verification. You can add a recovery email in case you forget the PIN.",
@@ -337,9 +337,9 @@
       "difficulty": 2,
       "question": "You are in a cafe with free public Wi-Fi. You need to check your bank balance. What is the better choice?",
       "choices": [
-        "Go ahead, because the Wi-Fi is free",
-        "Use the public Wi-Fi but write the password down",
-        "Log in twice to be safe",
+        "Go ahead, because the cafe's Wi-Fi is free and has a password",
+        "Use the public Wi-Fi, but log out of the bank right after",
+        "Use the public Wi-Fi, but change your bank password afterwards",
         "Wait, and use your own mobile data or a network you trust"
       ],
       "correct": 3,
@@ -352,10 +352,10 @@
       "difficulty": 2,
       "question": "Which is the strongest password choice for your online accounts?",
       "choices": [
-        "Your birthday",
-        "The word \"password\" with a number",
+        "A short word with a number added to it, such as Summer2024 or Lucky88",
+        "Your pet's name with your year of birth added at the end of it",
         "A passphrase of 12 or more characters, such as five random words",
-        "The same password for every account"
+        "One strong password that you use again for all of your accounts"
       ],
       "correct": 2,
       "explanation": "A strong passphrase is at least 12 characters long, for example five random words. Use a different one for each account and turn on 2FA, because reusing passwords puts every account at risk.",
@@ -367,10 +367,10 @@
       "difficulty": 3,
       "question": "An SMS says: \"Your parcel could not be delivered. Pay $1.50 at this short link to reschedule.\" You are not expecting a parcel. What should you do?",
       "choices": [
-        "Pay, since the fee is only $1.50",
+        "Tap the link only to read the message, and pay if it looks right",
         "Do not tap the link. Check using the courier's official app or website",
-        "Tap the link only to read it",
-        "Reply STOP to the SMS"
+        "Pay the $1.50, because a small fee cannot be a scam",
+        "Reply STOP to the SMS so that they stop messaging you"
       ],
       "correct": 1,
       "explanation": "Scam messages ask you to take action and often use shortened or scrambled links. Do not tap short links. If you are worried, check through the official app or website of the company, which you open yourself.",
@@ -383,9 +383,9 @@
       "question": "A caller says he is from a government agency. He tells you to stay on the line and pay a fine right now. What should you do?",
       "choices": [
         "Hang up, then verify using the official hotline or website",
-        "Stay on the line, as he says",
-        "Pay, to avoid trouble",
-        "Ask for his name and then pay"
+        "Stay on the line and ask the caller for his name and staff ID",
+        "Stay on the line and pay, to avoid any further trouble",
+        "Pay part of the fine now, and ask for the rest to be waived"
       ],
       "correct": 0,
       "explanation": "Government officials never demand immediate payment, ask you to transfer money, or forbid you from hanging up. Do not panic. Hang up and verify through the official hotline, app or website, not through details the caller gives.",
@@ -397,9 +397,9 @@
       "difficulty": 3,
       "question": "You search for your bank online. The first result has a small \"Sponsored\" label. What is the safest way to reach your bank's site?",
       "choices": [
-        "Click the first result, since it is at the top",
-        "Click any result that looks like the bank",
-        "Click the result with the most words",
+        "Click the first result, because search puts the real site at the top",
+        "Click the result that has the bank's logo and name in it",
+        "Click the result that has the most reviews and stars",
         "Type the bank's full official web address, or use its official app"
       ],
       "correct": 3,
@@ -412,10 +412,10 @@
       "difficulty": 3,
       "question": "A WhatsApp message from an unknown number invites you to join a paid survey panel for big pay. What should you check first?",
       "choices": [
-        "Whether the message has nice pictures",
-        "Whether many people have joined",
-        "Whether the company has real credentials, such as a UEN, address and phone number",
-        "Whether the message looks friendly"
+        "Whether the message has a professional logo and photos",
+        "Whether many other people have already joined the panel",
+        "Whether the company has a real UEN, address and phone number",
+        "Whether the sender replies to you quickly and politely"
       ],
       "correct": 2,
       "explanation": "Research the company and read reviews, and check that it has real credentials such as a physical address, phone number and UEN. Be careful with unsolicited invitations and big pay for little effort, and never share your PIN, password or OTP.",
@@ -427,10 +427,10 @@
       "difficulty": 3,
       "question": "You are not sure if a website can be trusted. What does \"lateral reading\" suggest you do?",
       "choices": [
-        "Read the same page again more slowly",
+        "Read the same page again, more slowly and carefully",
         "Open other reliable sources to check the website and its claims",
-        "Read the comments under the page",
-        "Read only the headline carefully"
+        "Read the comments below the page to see what others think",
+        "Read the headline and the first line very carefully"
       ],
       "correct": 1,
       "explanation": "Lateral reading means leaving the page and checking what other reliable sources say about the website and its claims. It helps you judge a source instead of trusting how it looks. Fact-check sites such as gov.sg/factually can also help.",
@@ -443,9 +443,9 @@
       "question": "An AI chatbot gives you website links to \"prove\" its answer. What should you remember?",
       "choices": [
         "AI can invent facts and fake links, so check them yourself",
-        "AI links are always real",
-        "A link is real if the AI sounds sure",
-        "Only the first link needs checking"
+        "Links from AI are always real, because it searches the web",
+        "A link is real if the AI sounds very sure about it",
+        "Only the first link needs to be checked, not the others"
       ],
       "correct": 0,
       "explanation": "AI can give inaccurate facts and links that do not exist. Check every important claim and link, and use AI to help your own thinking rather than replace it.",
@@ -457,10 +457,10 @@
       "difficulty": 3,
       "question": "You lose your phone, and it has a phone wallet with your cards. What is a good step?",
       "choices": [
-        "Wait a week in case it turns up",
-        "Do nothing, since it has a lock",
-        "Delete the app from your new phone only",
-        "Block payments remotely and tell your bank"
+        "Wait a week in case the phone turns up before acting",
+        "Do nothing, because the phone wallet needs your face or PIN",
+        "Delete the wallet app from your new phone and carry on",
+        "Block payments remotely and tell your bank straight away"
       ],
       "correct": 3,
       "explanation": "Phone wallet payments are protected by your fingerprint, face or PIN, but you should still act fast if your phone is lost. Block payments remotely and contact your bank. It also helps to switch on transaction alerts from your bank.",
@@ -472,10 +472,10 @@
       "difficulty": 3,
       "question": "A caller offers to \"help\" with your government application and asks for your Singpass 6-digit passcode. What should you do?",
       "choices": [
-        "Share it, since the caller is helping",
-        "Share half of the passcode",
+        "Share it, because the caller is helping with your application",
+        "Share only half of it, and keep the other half safe",
         "Never share it. Your Singpass passcode is only for you",
-        "Share it if the caller knows your NRIC"
+        "Share it if the caller can tell you your NRIC number"
       ],
       "correct": 2,
       "explanation": "Singpass is the official digital identity of the Singapore Government, so protect your passcode and your device. Get the Singpass app only from the official App Store or Google Play, and do not give your passcode to anyone.",
@@ -487,10 +487,10 @@
       "difficulty": 3,
       "question": "You see an app that claims to add extra features to WhatsApp. What should you do?",
       "choices": [
-        "Download it, because extra features are useful",
+        "Download it, because extra features can be useful to you",
         "Do not download it. Use only the official WhatsApp app",
-        "Download it if it has good reviews",
-        "Download it, then delete it if it is slow"
+        "Download it, but only if it has many good reviews",
+        "Download it, and delete it if it turns out to be slow"
       ],
       "correct": 1,
       "explanation": "Fake apps that copy WhatsApp or add extra features can look the same but risk identity fraud, data theft and malware. The real WhatsApp has built-in protection that fake apps lack.",
@@ -502,10 +502,10 @@
       "difficulty": 3,
       "question": "You get a message saying your data was in a breach, with a link to \"check\" it. What is the safest step?",
       "choices": [
-        "Verify through the organisation's official website or hotline, not the link",
-        "Tap the link to check quickly",
-        "Reply with your details to confirm",
-        "Forward it to your contacts"
+        "Check on the organisation's official website, not through the link",
+        "Tap the link to check whether your details were leaked",
+        "Reply with your details so the organisation can confirm them",
+        "Forward the message to your contacts to warn them first"
       ],
       "correct": 0,
       "explanation": "Scammers pretend to be organisations notifying you of a data breach. Check breach notices through the organisation's official website or hotline, not through the link in the message.",
@@ -517,10 +517,10 @@
       "difficulty": 3,
       "question": "A caller says he is from your internet company. He says your connection is faulty and asks you to install software so he can \"fix\" it. What should you do?",
       "choices": [
-        "Install it, as he is from the company",
-        "Install it but do not give the password",
-        "Ask him to send a link by SMS",
-        "Do not install anything. Hang up and call the company on its official number"
+        "Install it, but watch the screen closely and give him no password",
+        "Install it, because he knows which company you use for your internet",
+        "Ask him to send the link by SMS first, then install it from there",
+        "Install nothing. Hang up and call the company on its official number"
       ],
       "correct": 3,
       "explanation": "Tech support scams pretend to be from a telco or internet company and ask you to install software. Never install software or give remote access because a caller asks. Check by contacting the company yourself.",
@@ -532,10 +532,10 @@
       "difficulty": 3,
       "question": "You see an article headline and want to share it. You have not read the article. What should you do?",
       "choices": [
-        "Share it now, as the headline is clear",
-        "Share it, and read it later",
-        "Read the whole article first, and think about the people you will send it to",
-        "Share it if it has many likes"
+        "Share it now, because the headline is clear enough",
+        "Share it now and read the article later when you have time",
+        "Read the whole article first, and think about who will get it",
+        "Share it if the article has many likes and comments"
       ],
       "correct": 2,
       "explanation": "A headline alone is not enough to judge an article. Read or watch the whole item before you share, and think about the effect on the people who will receive it.",
@@ -547,10 +547,10 @@
       "difficulty": 4,
       "question": "A caller says he is from your bank. When you doubt him, he says: \"Call this number to check, it is our hotline.\" What should you do?",
       "choices": [
-        "Call the number he gave, because he offered it",
+        "Call the number he gave, because he offered it for checking",
         "Hang up, and look up the bank's official number yourself",
-        "Call it, but give no details",
-        "Ask him to call back from another number"
+        "Call that number but give him no personal details",
+        "Ask him to call you back from a different number"
       ],
       "correct": 1,
       "explanation": "Verify by calling the organisation's official main number, not the number the caller gives you. A number given by the caller may lead straight back to the scammer. Stop talking if you are unsure, then check the source yourself.",
@@ -563,9 +563,9 @@
       "question": "A message from a family member's account says: \"I am in a hurry. Please send me money now.\" It feels a little unusual. What should you do?",
       "choices": [
         "Stop, and call your family member on the number you already know",
-        "Send the money first, then ask later",
-        "Reply to ask for their bank details",
-        "Ask them to send a photo"
+        "Send a small amount first, then ask when they are free",
+        "Reply and ask for their bank details before sending money",
+        "Ask them to send a photo of themselves, then send the money"
       ],
       "correct": 0,
       "explanation": "Hacked or spoofed accounts can pose as friends or family. Be wary of unusual requests, especially for money. Stop, and check with the person using a number you already have before you send anything.",
@@ -577,9 +577,9 @@
       "difficulty": 4,
       "question": "You get a video call from someone who looks and sounds like a relative and asks you to transfer money now. What is the safest step?",
       "choices": [
-        "Transfer the money, as it looks and sounds like them",
-        "Transfer a small amount first",
-        "Ask them to switch the camera on, then transfer",
+        "Transfer the money, because you can see and hear them",
+        "Transfer a small amount first, to see if it is really them",
+        "Ask them to switch the camera on again, then transfer the money",
         "End the call and phone your relative on a number you know"
       ],
       "correct": 3,
@@ -592,10 +592,10 @@
       "difficulty": 4,
       "question": "A video shows a famous person praising an investment and urging you to join now. What should you do?",
       "choices": [
-        "Join, because a famous person recommends it",
-        "Join with a small amount",
-        "Be careful. It could be a deepfake, so check with trusted sources first",
-        "Share it so others can join"
+        "Join, because a famous person would not recommend a scam",
+        "Join with a small amount to test whether it works",
+        "Be careful. It could be a deepfake. Check trusted sources first",
+        "Share the video so that your friends can join in too"
       ],
       "correct": 2,
       "explanation": "Scammers can use AI-made videos of celebrities to promote investments. A famous face does not prove an investment is safe. Check with trusted sources, and do not rush.",
@@ -607,10 +607,10 @@
       "difficulty": 4,
       "question": "Which is a clue that a video may be a deepfake?",
       "choices": [
-        "The video is short",
-        "Unnatural face movements, odd lighting, or blurring around the edge of the face",
-        "The video is in colour",
-        "The video has music"
+        "The speaker's voice is quiet, and the whole video is only a few seconds long",
+        "Odd face movements, strange lighting, or blurring at the face edges",
+        "The video has already been shared by many people on social media",
+        "The video is posted by someone with a large number of followers"
       ],
       "correct": 1,
       "explanation": "Deepfake clues include unnatural facial expressions, inconsistent resolution or lighting, and blurring around the edges of the face. Check the content against other trusted sources and do not share it if you are unsure.",
@@ -623,9 +623,9 @@
       "question": "An email looks like it is from a senior government leader and asks you to reply with personal details. What should you do?",
       "choices": [
         "Do not reply. Check using reliable sources or the official website",
-        "Reply, because it is from a leader",
-        "Forward it to your friends to warn them",
-        "Reply with only your name"
+        "Reply, because an email from a government leader must be genuine",
+        "Forward it to all your friends and family, to warn them about it",
+        "Reply with only your name, and keep all your other details back"
       ],
       "correct": 0,
       "explanation": "Fake emails pretending to be from officials have been used to get people to reply. Check against reliable sources before you respond or forward, and use scamalert.sg or the Anti-Scam hotline if you are unsure.",
@@ -637,9 +637,9 @@
       "difficulty": 4,
       "question": "Why is a digital token in your banking app safer than relying only on SMS OTPs?",
       "choices": [
-        "Tokens are free",
-        "Tokens do not need a phone",
-        "Tokens let the bank call you",
+        "Tokens work without a phone or an internet connection",
+        "Tokens are free, but SMS OTPs always cost money to send",
+        "Tokens let the bank phone you to confirm each payment",
         "Scammers can trick people into revealing SMS OTPs"
       ],
       "correct": 3,
@@ -652,10 +652,10 @@
       "difficulty": 4,
       "question": "What does a bank feature such as POSB or DBS digiVault do?",
       "choices": [
-        "It sends you a new password each day",
-        "It hides your balance from the bank",
-        "It locks your savings against scam transfers, and you can unlock at an ATM",
-        "It pays you extra interest for waiting"
+        "It gives you a new password each day for your banking app",
+        "It hides your account balance from anyone who sees your phone",
+        "It locks savings against scam transfers; you can unlock at an ATM",
+        "It pays you extra interest for leaving your money untouched"
       ],
       "correct": 2,
       "explanation": "digiVault lets you lock part or all of your savings so scammers cannot make unauthorised digital transfers from your phone. Locked money keeps earning interest, and you can unlock it at an ATM.",
@@ -667,10 +667,10 @@
       "difficulty": 4,
       "question": "On an Android phone, you want a government app. How can you tell the app is really linked to the government?",
       "choices": [
-        "Check that the app has many downloads",
+        "Check that millions of people have downloaded the app and rated it highly",
         "Look for the government badge next to the app's rating in Google Play",
-        "Check that the app icon looks official",
-        "Check that the app is free"
+        "Check that the app icon looks like the official logo of a government agency",
+        "Check that the app asks you to log in with your Singpass details first"
       ],
       "correct": 1,
       "explanation": "Google Play shows a government badge, a building icon beside the rating, for apps it has verified as government-affiliated. Check for the badge before you install a government app, and report suspicious apps to Google Play.",
@@ -683,9 +683,9 @@
       "question": "You see a QR code stuck on a lamp post that promises a free gift if you scan it. What should you do?",
       "choices": [
         "Do not scan it. Check that a QR code is genuine before you use it",
-        "Scan it, since it is free",
-        "Scan it but do not tap anything",
-        "Scan it and share the link"
+        "Scan it, but close the page at once if it asks for any details",
+        "Scan it, because a free gift is surely worth a quick look",
+        "Scan it, then share the link so that your friends can get a gift too"
       ],
       "correct": 0,
       "explanation": "QR codes can be malicious. Check that a QR code is legitimate before you scan or act on it, and be careful with unexpected or tampered-looking codes.",
@@ -697,9 +697,9 @@
       "difficulty": 4,
       "question": "Your friend chats with an AI companion app for hours every day and has stopped meeting friends. What is the healthy approach?",
       "choices": [
-        "Let the app replace real friends",
-        "Ask the app for medical advice",
-        "Share bank details with the app so it can help",
+        "Let the app take the place of friends, since it is always kind",
+        "Ask the app for medical advice, since it is available all day",
+        "Tell the app your bank details so that it can help you better",
         "Use it in moderation, and keep real friends and family as the priority"
       ],
       "correct": 3,
@@ -712,10 +712,10 @@
       "difficulty": 4,
       "question": "You post a photo, then delete it an hour later. What is true?",
       "choices": [
-        "It is gone for good",
-        "Only you could ever see it",
+        "It is gone for good once you press the delete button",
+        "It is deleted from the phones of everyone who saw it",
         "It may still exist, because others may have copied or saved it",
-        "It is deleted from every phone"
+        "Only your friends could see it, and they cannot save it"
       ],
       "correct": 2,
       "explanation": "Everything you do online leaves a trail, even deleted items. Content is hard to take back and can spread beyond the people you meant to show. Think before you post, limit location sharing, and check who can see your posts.",
@@ -727,10 +727,10 @@
       "difficulty": 5,
       "question": "A friendly caller from \"your telco\" knows your name. He says he needs to install an app on your phone to check for problems. What should you do?",
       "choices": [
-        "Install it, because he knows your name",
-        "Say no and hang up. Never give remote access unless the caller is proven to be official",
-        "Install it but watch what he does",
-        "Install it if he gives a reference number"
+        "Install it, because he knows your name and your telco",
+        "Say no and hang up. Never allow remote access to your phone",
+        "Install it, but watch closely what he does on the phone",
+        "Install it if he gives you a reference number to quote"
       ],
       "correct": 1,
       "explanation": "Knowing your name does not prove who a caller is. Never give remote access unless the representative is proven official, and do not download anything before you have verified the source.",
@@ -742,10 +742,10 @@
       "difficulty": 5,
       "question": "Concert tickets are for sale far below the usual price by a seller with no reviews who wants payment first. What is the safest choice?",
       "choices": [
-        "Do not buy. Use a platform that releases payment only after you receive the item",
-        "Buy, since cheap tickets sell fast",
-        "Pay half to be safe",
-        "Buy if the seller shares a friendly photo"
+        "Do not buy. Use a platform that pays the seller only after delivery",
+        "Buy quickly, because cheap tickets like these sell out within minutes",
+        "Pay half the price now to hold them, and the other half on the day",
+        "Buy if the seller sends a clear photo of the tickets with the date"
       ],
       "correct": 0,
       "explanation": "A price much lower than usual, no reviews and a request to pay upfront are warning signs. Use platforms that release payment only after you receive the item, prefer meet-ups or pay on delivery, and check sellers on the CASE Company Alert List.",
@@ -757,9 +757,9 @@
       "difficulty": 5,
       "question": "Someone recommends an investment app that is not in the Apple App Store or Google Play, and says to install it from a link. What should you do?",
       "choices": [
-        "Install it, because a friend recommends it",
-        "Install it and check the permissions later",
-        "Install it and invest only a little",
+        "Install it, because a friend you trust recommended it to you for investing",
+        "Install it, then look at the permissions it asks for after you have started",
+        "Install it and put in only a small amount of money, to try it out first",
         "Do not install it. Apps from outside the official stores can be malicious"
       ],
       "correct": 3,
@@ -772,10 +772,10 @@
       "difficulty": 5,
       "question": "A new online friend says they love you after only a week. Then they ask you urgently for money for an emergency. What is this?",
       "choices": [
-        "A sign they truly care, so help them",
-        "A test of trust, so send a small amount",
-        "A warning sign of a love scam. Do not send money, and talk to someone you trust",
-        "A normal way to start a friendship"
+        "A sign that they trust you deeply, so it is kind to help them out",
+        "A test of trust, so send a small amount first to show that you care",
+        "A love scam warning sign. Send no money and talk to someone you trust",
+        "A normal way for an online friendship to move quickly and become close"
       ],
       "correct": 2,
       "explanation": "In a love scam, a quick bond is followed by an urgent request for money. Be wary of unsolicited friend requests and money requests from someone you only know online. Do not send money, and talk to a family member or friend you trust.",
@@ -787,10 +787,10 @@
       "difficulty": 5,
       "question": "An old article about a medicine is being shared as if it is new. Which check helps you most?",
       "choices": [
-        "Length: how long the article is",
-        "Currency: is the information up to date?",
-        "Colour: how professional the page looks",
-        "Likes: how many people liked it"
+        "Popularity: how many people have shared it",
+        "Currency: is the information still up to date?",
+        "Design: how professional the page looks",
+        "Length: whether the article is long and detailed"
       ],
       "correct": 1,
       "explanation": "Judge online information by its accuracy (is it correct), authority (who is behind it) and currency (is it up to date). Old information shared as new can mislead you, so check the date and look at other sources.",
@@ -802,10 +802,10 @@
       "difficulty": 5,
       "question": "The S.U.R.E. steps help you check information, including what AI tells you. What does the \"R\" stand for?",
       "choices": [
-        "Research: look at other trusted sources",
-        "Report: tell the police",
-        "Remember: save it for later",
-        "Reply: answer the sender"
+        "Research: check other trusted sources",
+        "Report: tell the police about what you saw",
+        "Repeat: read the message again to be sure",
+        "React: reply to the sender and ask them"
       ],
       "correct": 0,
       "explanation": "S.U.R.E. stands for Source, Understand, Research and Evaluate. Use the steps on what you see online and on what AI tells you, and verify through trusted sources.",
@@ -817,10 +817,10 @@
       "difficulty": 5,
       "question": "Singpass now has extra safeguards, such as extra face verification checks. What should you still do?",
       "choices": [
-        "Relax, because scams can no longer happen",
-        "Share your passcode with family to be safe",
-        "Write your passcode on your phone case",
-        "Stay vigilant, because scams keep changing, and protect your Singpass"
+        "Relax, because the new checks mean scams can no longer work",
+        "Share your passcode with family, so they can help you",
+        "Write your passcode on a note kept inside your phone case",
+        "Stay alert, as scams keep changing, and protect your Singpass"
       ],
       "correct": 3,
       "explanation": "Safeguards help, but scams evolve, and everyone has a part to play in protecting their Singpass. Stay alert and never share your passcode.",
@@ -832,10 +832,10 @@
       "difficulty": 5,
       "question": "Someone keeps sending you threatening messages online. What is a sensible first step?",
       "choices": [
-        "Reply angrily so they stop",
-        "Delete everything straight away",
+        "Reply firmly to tell them to stop, then block them if they carry on",
+        "Delete the messages straight away so that you do not have to see them",
         "Take screenshots as evidence, do not reply, and report to the platform",
-        "Delete the chat and tell nobody"
+        "Delete the chat and tell nobody about it, so that it does not spread"
       ],
       "correct": 2,
       "explanation": "It is not your fault. Do not engage, keep evidence with screenshots before it is deleted, block and report to the platform, and tell someone you trust. If there are credible threats to your safety, call the police.",
@@ -847,10 +847,10 @@
       "difficulty": 5,
       "question": "You open a page that looks like your bank's, but the web address is not your bank's real address. It asks for your NRIC and card details. What should you do?",
       "choices": [
-        "Log in, since the page looks the same",
-        "Close it. Check the web address, and use the bank's official app or site",
-        "Log in with a different password",
-        "Bookmark it for next time"
+        "Log in, because the page looks exactly like the bank's",
+        "Close it, and go to the bank through its official app or site",
+        "Log in, but type a different password to be safe",
+        "Bookmark the page so you can come back to it later"
       ],
       "correct": 1,
       "explanation": "Fake government or banking sites copy the real thing to collect NRIC, passport or financial details. The look of a page is not proof. Check that the address is the authentic one, or go through the bank's official app or an address you typed yourself.",
@@ -863,9 +863,9 @@
       "question": "You check your transport card app and see a payment you do not recognise. What is a good step?",
       "choices": [
         "Review your transaction history, and block the card payment if needed",
-        "Ignore it, because it is probably small",
-        "Wait until the end of the year",
-        "Ask a stranger online to check it"
+        "Ignore it for now, because the amount is probably too small to matter",
+        "Wait until the end of the month to see whether it happens again",
+        "Ask someone you met online to look into the payment for you"
       ],
       "correct": 0,
       "explanation": "Review your transaction history regularly, and log out of payment apps when you are done. Know how to block a card payment and request a refund. If you do not recognise a payment, act early.",
@@ -877,10 +877,10 @@
       "difficulty": 5,
       "question": "An email says \"Your parcel details\" and has an attachment named \"invoice.exe\". You did not order anything. What should you do?",
       "choices": [
-        "Open it to see what it is",
-        "Forward it to a friend to check",
-        "Reply to ask the sender",
-        "Do not open it. Delete the email, since attachments like this can be harmful"
+        "Open it carefully to see what it is, and then delete the email",
+        "Forward it to a friend so they can check whether it is safe for you",
+        "Reply to ask the sender what the attachment is and who it is from",
+        "Do not open it. Delete the email; such attachments can be harmful"
       ],
       "correct": 3,
       "explanation": "Phishing emails can include suspicious attachments, such as .exe files. Do not click links or open attachments you did not expect. Delete the message and, if unsure, check with the organisation through its official website or hotline.",
@@ -892,14 +892,314 @@
       "difficulty": 5,
       "question": "A Facebook friend messages: \"Sorry, I sent my OTP to your phone by mistake. Please send it to me.\" What should you do?",
       "choices": [
-        "Send it, because it is a friend",
-        "Send it, then change your password",
+        "Send it, because a friend would never try to trick you",
+        "Send it, and then change your password straight afterwards",
         "Do not send it. Call your friend on a number you know to check",
-        "Send it if they say it is urgent"
+        "Send it, because they say it is urgent and they have apologised"
       ],
       "correct": 2,
       "explanation": "Scammers pretend to be friends and ask for an OTP \"sent by mistake\". Never share an OTP with anyone. Check by calling your friend on a number you already know.",
       "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/ta-be-safe"
+    },
+    {
+      "id": "skill-01",
+      "category": "digital_skills",
+      "difficulty": 5,
+      "question": "A man names his daughter as his HealthHub caregiver on 2 December 2025. He wants her to see his reports, ask for medicine refills and pay his hospital bill. What is true?",
+      "choices": [
+        "She can manage appointments and bills, but his reports need a separate permission request",
+        "A new caregiver gets full access to his health records, and can also do refills and payments",
+        "A caregiver can read health records but is never allowed to make payments for him",
+        "Full record access only applies to caregivers who were appointed before 23 November 2025"
+      ],
+      "correct": 1,
+      "explanation": "For caregivers appointed from 23 November 2025 onward, HealthHub gives access to the care recipient's available health records. Caregivers can also do supported actions such as managing appointments, asking for medication refills and paying healthcare bills. Caregiver access is not view-only.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/accessing-health-services"
+    },
+    {
+      "id": "skill-02",
+      "category": "digital_skills",
+      "difficulty": 5,
+      "question": "Mr Lim has a polyclinic appointment at 2:00 PM that can be pre-registered on HealthHub. Which time is inside the pre-registration window?",
+      "choices": [
+        "12:45 PM",
+        "12:15 PM",
+        "12:25 PM",
+        "Only 1:30 PM, because registration opens exactly 30 minutes before"
+      ],
+      "correct": 0,
+      "explanation": "HealthHub's digital pre-registration window can open 30 to 90 minutes before the appointment. For a 2:00 PM appointment, 12:45 PM is 75 minutes before, so it is inside the window. 12:15 PM and 12:25 PM are too early, and it is not only 30 minutes before.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/accessing-health-services"
+    },
+    {
+      "id": "skill-03",
+      "category": "digital_skills",
+      "difficulty": 5,
+      "question": "At a government counter, an officer asks Priya to show that the Digital IC on her phone is live and not just a screenshot. What should she do?",
+      "choices": [
+        "Take a new screenshot while the officer watches",
+        "Turn the phone sideways to show the full screen",
+        "Scan the officer's NRIC with the Singpass scanner",
+        "Tap Show barcode, to show that the Digital IC responds"
+      ],
+      "correct": 3,
+      "explanation": "The Show barcode function helps show that the Digital IC is interactive and live, not a static screenshot. Taking another screenshot would not prove that the identity is genuine or current.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/accessing-essential-citizen-services"
+    },
+    {
+      "id": "skill-04",
+      "category": "digital_skills",
+      "difficulty": 5,
+      "question": "Singpass can scan a QR code to log in to a website, share Myinfo, or sign a document. Which statement is correct?",
+      "choices": [
+        "All three work the same way: scan the QR code, and no further confirmation should appear on screen",
+        "Myinfo sharing needs no consent once Singpass is unlocked, because you have already logged in",
+        "Login: scan and verify. Myinfo: see what is shared, then agree. Signing: check the reference code first",
+        "A reference code is needed for ordinary website login, but not for signing a document"
+      ],
+      "correct": 2,
+      "explanation": "Singpass QR uses differ by task. Logging in requires authentication. Sharing Myinfo shows the information requested before you agree. Digital signing can require you to verify a reference code before you approve. The processes are not the same, even though a QR scan may be involved.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/accessing-digital-services-with-singpass"
+    },
+    {
+      "id": "skill-05",
+      "category": "digital_skills",
+      "difficulty": 5,
+      "question": "In October 2026, Daniel types his friend's PayNow mobile number and sees only some letters of the name. Why?",
+      "choices": [
+        "It is a PayNow fault, so he should never make this payment and should report it to his bank",
+        "Since 6 June 2026 retail names show some letters only; company names are full. Still check the payee",
+        "From June 2026 every PayNow name, including company names, is hidden from the person paying",
+        "Only NRIC transfers are masked; mobile number and QR payments still show the full name"
+      ],
+      "correct": 1,
+      "explanation": "From 6 June 2026, PayNow shows only selected letters of a retail recipient's name instead of the full name. Company recipients still show their full registered name. Always check that what you see matches the person you mean to pay before you confirm.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/online-banking-and-e-payment-paynow"
+    },
+    {
+      "id": "skill-06",
+      "category": "digital_skills",
+      "difficulty": 5,
+      "question": "Mei Ling cannot turn Singpass on for AutoFill while making a passkey on her iPhone. Three other credential managers are already on. What should she do?",
+      "choices": [
+        "Turn off one other credential manager, switch Singpass on under AutoFill & Passwords, and continue in the app",
+        "Delete her Singpass account and register again, so that the app lets her create a passkey",
+        "Turn off Face ID, because a Singpass passkey cannot be used together with face or fingerprint login",
+        "Create the passkey from the Singpass website on her phone, because the app cannot create one"
+      ],
+      "correct": 0,
+      "explanation": "Singpass passkeys are made in the Singpass app, and Singpass must be switched on as a credential provider for AutoFill. An iPhone allows only a limited number of credential managers at once, so if all the places are taken, turn one off before turning Singpass on.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/accessing-essential-citizen-services"
+    },
+    {
+      "id": "skill-07",
+      "category": "digital_skills",
+      "difficulty": 5,
+      "question": "Ravi wants to PayNow a friend by mobile number, PayNow another person by their NRIC/FIN, and pay a shop's SGQR that has a PayNow logo. What is correct?",
+      "choices": [
+        "Use mobile numbers only, since PayNow cannot send money by NRIC/FIN or by scanning a QR",
+        "Use the NRIC/FIN only for government payments, and the mobile number for everyone else",
+        "Scan the shop's SGQR, then type in the shop's bank account number to finish paying",
+        "Use the mobile number, then the NRIC/FIN, then scan the SGQR in a banking or payment app"
+      ],
+      "correct": 3,
+      "explanation": "PayNow can use several identifiers. Individuals receive money through a PayNow-registered mobile number or NRIC/FIN, and businesses may use a UEN. You can also pay a merchant by scanning an SGQR that supports PayNow. The sender normally does not need to type in the recipient's bank account number.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/online-banking-and-e-payment-paynow"
+    },
+    {
+      "id": "skill-08",
+      "category": "digital_skills",
+      "difficulty": 5,
+      "question": "A saved contact's number is taken over and sends Nurul a scam message. What is most accurate about ScamShield?",
+      "choices": [
+        "It always filters the message, because it checks every SMS that arrives on her phone",
+        "It cannot check screenshots from WhatsApp or Telegram, so she cannot get help from the app",
+        "It does not filter saved contacts, for privacy, so she must judge it herself and can submit it",
+        "Once she reports the message in ScamShield, a police report is made for her automatically"
+      ],
+      "correct": 2,
+      "explanation": "ScamShield does not automatically filter calls or SMSes from saved contacts, because that could affect privacy and genuine messages. A scam can still come from a hacked or spoofed familiar contact, so judge suspicious requests yourself and check or report them when needed. A ScamShield report is not a police report.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/be-safe"
+    },
+    {
+      "id": "skill-09",
+      "category": "digital_skills",
+      "difficulty": 5,
+      "question": "Aisha's tablet has no SIM card. A friend says Wireless@SGx needs a Singapore SIM in the device. What is most accurate?",
+      "choices": [
+        "Her friend is right: every device must have a Singapore SIM card inside it to connect to Wireless@SGx",
+        "No SIM is needed in the tablet, but setup needs internet and a local number that can get an SMS OTP",
+        "She needs no SIM, no mobile number and no internet: the tablet will find and join hotspots by itself",
+        "Wireless@SGx is only for Singapore citizens, who must log in with Singpass to use it"
+      ],
+      "correct": 1,
+      "explanation": "A device does not need a Singapore SIM card inside it to use Wireless@SGx. A device without a local SIM can still be set up, but setup may need internet access and a local mobile number that can receive an SMS OTP.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/connecting-your-device-to-cellular-network-and-wi-fi"
+    },
+    {
+      "id": "skill-10",
+      "category": "digital_skills",
+      "difficulty": 5,
+      "question": "Mr Goh loses his registered SimplyGo card. He has never done Singpass Myinfo verification in the app. What is the right order?",
+      "choices": [
+        "Select the card, tap Block Card, verify identity, choose how the value is refunded, then confirm",
+        "Delete the card in the app, wait 24 hours, and then ask Grab for a refund of the balance",
+        "Only unregistered cards can be blocked, because registered cards are already protected",
+        "SimplyGo can show his transactions but has no way to block a lost registered card"
+      ],
+      "correct": 0,
+      "explanation": "For an eligible registered card, the SimplyGo app can block a lost card. If identity verification has not been done before, you may be asked to verify your identity first. Then choose how the remaining value is refunded and confirm the block.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/navigating-public-transport-and-ride-hailing-apps"
+    },
+    {
+      "id": "skill-11",
+      "category": "digital_skills",
+      "difficulty": 5,
+      "question": "Linda wants (1) MRT or road alerts and nearby buses, (2) to review the payments on her transport card, (3) to book a private-hire car. Which apps, in that order?",
+      "choices": [
+        "Grab, then MyTransport.SG, then SimplyGo",
+        "SimplyGo, then Grab, then MyTransport.SG",
+        "MyTransport.SG can do all three of these jobs",
+        "MyTransport.SG, then SimplyGo, then Grab"
+      ],
+      "correct": 3,
+      "explanation": "The three apps do different jobs. MyTransport.SG gives bus arrivals, transport and traffic information, and alerts. SimplyGo manages your transport card and shows its transactions. Grab books and tracks private-hire rides.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/navigating-public-transport-and-ride-hailing-apps"
+    },
+    {
+      "id": "skill-12",
+      "category": "digital_skills",
+      "difficulty": 5,
+      "question": "Hafiz typed his card details into a fake Grab page (X). Separately, his Grab login looks hacked, with strange activity (Y). What is the right response?",
+      "choices": [
+        "X: reset the GrabPIN and nothing more. Y: cancel the physical credit card and nothing more",
+        "Uninstalling the Grab app fixes both problems, because it removes the fake page and the login",
+        "X: tell the bank and block the card. Y: use Emergency Switch, reset GrabPIN and report to Grab",
+        "Emergency Switch reverses completed credit-card payments at the bank, so it fixes both"
+      ],
+      "correct": 2,
+      "explanation": "The right response depends on what was compromised. If card details went into a fake site, contact the bank or card issuer to secure the card. If the Grab account itself looks compromised, use Grab's security features, such as securing the account and resetting the GrabPIN, and report the activity. Uninstalling the app secures neither the card nor the account.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/navigating-public-transport-and-ride-hailing-apps"
+    },
+    {
+      "id": "skill-13",
+      "category": "digital_skills",
+      "difficulty": 5,
+      "question": "Madam Tan has unpaid NLB charges and tries to borrow another book. What is correct?",
+      "choices": [
+        "Borrowing carries on as normal until her unpaid charges go over $50, and then it stops",
+        "Borrowing can stop until she pays; NLB Mobile takes cards, Apple Pay, Google Pay and PayNow QR",
+        "She can pay only with cash or NETS, and the NLB Mobile app cannot take card payments",
+        "Charges can only be paid at the library counter, because the app cannot process payments"
+      ],
+      "correct": 1,
+      "explanation": "Outstanding NLB charges can affect borrowing, and borrowing can be restored after payment. NLB offers digital ways to pay, including cards, mobile wallets and PayNow QR, so you do not have to visit a counter to settle charges.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/accessing-digital-learning-apps"
+    },
+    {
+      "id": "skill-14",
+      "category": "digital_skills",
+      "difficulty": 5,
+      "question": "Farid paid $180 on Shopee by scanning the PayNow QR in his bank app. His return is approved. He says the money will surely go to ShopeePay. Is he right?",
+      "choices": [
+        "No. It goes back by PayNow to the original payment method, so check the bank app he used",
+        "Yes, every Shopee refund goes into ShopeePay, whatever way the order was paid for",
+        "PayNow purchases cannot be refunded electronically, so he must collect $180 in cash",
+        "Shopee refunds PayNow purchases only as Shopee Coins, which he can use on later orders"
+      ],
+      "correct": 0,
+      "explanation": "When a Shopee order paid by PayNow is refunded, the money goes back through the original PayNow payment method, not automatically into ShopeePay. Check the banking or payment app you originally used to scan and pay the PayNow QR.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/accessing-online-shopping-services"
+    },
+    {
+      "id": "skill-15",
+      "category": "digital_skills",
+      "difficulty": 5,
+      "question": "Cheryl makes a calendar event with a reminder 30 minutes before, and invites her brother. What is correct?",
+      "choices": [
+        "Her 30-minute reminder is forced onto her brother's calendar and he cannot change it",
+        "Guests cannot have any reminders of their own for an event that someone else created",
+        "Adding more than one reminder turns the event into a repeating event every week",
+        "Guests get reminders from their own settings; her reminder is not shared with them"
+      ],
+      "correct": 3,
+      "explanation": "A reminder set by the organiser is a personal notification setting. Guests using Google Calendar manage reminders through their own notification settings, so Cheryl's 30-minute reminder is not forced onto her invited guests.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/personalising-your-devices-software-and-hardware-settings"
+    },
+    {
+      "id": "skill-16",
+      "category": "digital_skills",
+      "difficulty": 5,
+      "question": "Kumar has a Monday to Friday 7:00 AM alarm. He is on leave Tuesday to Thursday this week only. What is best, where available in Google's Clock app?",
+      "choices": [
+        "Switch the alarm off completely, which only skips the next time it would ring",
+        "Remove Tuesday to Thursday from the repeat days, then add them back after leave",
+        "Use Pause alarm for those dates, keeping the repeating alarm as it is",
+        "Snooze Monday's alarm until Friday so that it does not ring on the days in between"
+      ],
+      "correct": 2,
+      "explanation": "Where available, Pause alarm suspends a repeating alarm for the dates you choose without changing its repeat schedule. That is better than deleting repeat days, or turning the alarm off and having to set it up again later.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/personalising-your-devices-software-and-hardware-settings"
+    },
+    {
+      "id": "skill-17",
+      "category": "digital_skills",
+      "difficulty": 5,
+      "question": "Siti is travelling where mobile data may not work. She expects to translate menus and common phrases. What is the best preparation?",
+      "choices": [
+        "Wait until she has no internet, then open the app and download the language that she needs",
+        "Download the languages in advance, ideally on Wi-Fi; the camera can also translate signs and menus",
+        "Take a screenshot of every menu to translate later, because Translate cannot use the camera",
+        "Do nothing in advance: offline translation works for every language without any download"
+      ],
+      "correct": 1,
+      "explanation": "You can download supported languages in advance for offline translation. Do it while you have internet, ideally on Wi-Fi. Google Translate can also use the phone camera to translate printed text such as signs, labels and menus.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/explore-and-download-apps-on-your-mobile-device"
+    },
+    {
+      "id": "skill-18",
+      "category": "digital_skills",
+      "difficulty": 5,
+      "question": "Jason wants his own microphone muted whenever he joins a Zoom meeting. A trainer wants everyone muted when they enter her meeting. What is correct?",
+      "choices": [
+        "Jason turns on Keep my microphone muted; the trainer uses the host's mute-on-entry setting",
+        "Only the trainer can set Jason's microphone when he joins; he has no setting of his own",
+        "Jason's own setting also mutes everyone else who joins the meeting he attends",
+        "A microphone muted on entry can never be unmuted again during that meeting"
+      ],
+      "correct": 0,
+      "explanation": "These are two different controls. A participant can set their own microphone to stay muted when they join meetings, while a host or administrator can set participants to enter muted. One person's own microphone setting does not control anyone else's.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/guide-to-video-conferencing"
+    },
+    {
+      "id": "skill-19",
+      "category": "digital_skills",
+      "difficulty": 5,
+      "question": "Melissa sets Privacy, then Groups, to My Contacts Except and leaves out Alex. What is correct?",
+      "choices": [
+        "Alex is blocked completely and can never contact Melissa in a group or in a private chat",
+        "Alex is removed from every group that he and Melissa already share with each other",
+        "The setting can only be changed through WhatsApp Web, and not on the phone itself",
+        "Alex cannot add her to new groups directly but can send an invite link; her groups stay"
+      ],
+      "correct": 3,
+      "explanation": "My Contacts Except... controls who can add you directly to new WhatsApp groups. An excluded person can still send you a private invitation link to join a group. The setting also does not remove you from groups you have already joined.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/how-to-use-two-step-verification-privacy-tips-whatsapp"
+    },
+    {
+      "id": "skill-20",
+      "category": "digital_skills",
+      "difficulty": 5,
+      "question": "A poster says Singapore Government Benefits Portal, Scan Here. Its QR code opens https://singapore-gov-benefits-secure.com with a padlock. Another opens https://go.gov.sg/example. Which conclusion is strongest?",
+      "choices": [
+        "Both are government sites, because both addresses begin with https and show a padlock",
+        "The first must be real, because the words Singapore and gov are in the address",
+        "A padlock proves nothing. Government sites end in .gov.sg, so the first one is suspicious",
+        "QR codes cannot lead to harmful sites, so the web address does not matter at all"
+      ],
+      "correct": 2,
+      "explanation": "HTTPS and a padlock only mean the connection is encrypted. They do not prove that a site belongs to the Government. Official Singapore Government websites use the .gov.sg domain, and go.gov.sg is an official government short-link service. A look-alike such as singapore-gov-benefits-secure.com should be treated with suspicion.",
+      "source": "https://www.digitalforlife.gov.sg/learn/resources/all-resources/malicious-qr-codes"
     }
   ]
 }
