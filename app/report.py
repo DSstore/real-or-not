@@ -1,7 +1,8 @@
 """Progress report: a PDF with a summary, an earlier-versus-later comparison, trend charts, and a round table.
 
-Command line:  .\.venv\Scripts\python.exe -m app.report --user NAME [--days 30 | --since 2026-10-01] [--out FILE]
-The dashboard's Export report button uses the same builder.
+Command line:  .\.venv\Scripts\python.exe -m app.report --user NAME [--game quiz] [--days 30 | --since 2026-10-01] [--out FILE]
+The dashboard's Export report button uses the same builder. ``--game quiz`` makes the scam quiz report instead
+(app/quiz_report.py), which shares this module's page helpers.
 
 The numbers are gameplay measurements from a prototype. They are not medical measurements and the
 report says so.
@@ -248,6 +249,8 @@ def main(argv: list[str] | None = None, *, prompt: Prompt = getpass.getpass, now
     window = parser.add_mutually_exclusive_group()
     window.add_argument("--days", type=int, help="Only rounds from the last N days")
     window.add_argument("--since", help="Only rounds from this date on, as YYYY-MM-DD")
+    parser.add_argument("--game", choices=("garden", "quiz"), default="garden",
+                        help="Which game's report to make (default: garden, the Reach Garden report)")
     parser.add_argument("--out", type=Path, help="Where to save the PDF (default: reports/ in the project)")
     args = parser.parse_args(argv)
     now = now or datetime.now()
@@ -269,9 +272,15 @@ def main(argv: list[str] | None = None, *, prompt: Prompt = getpass.getpass, now
         start_logging(settings, "report", console=False)
         user = log_in(args.user, args.users_db, prompt, **auth_options)
         store = store_from_args(args.store, args.file, settings)
-        documents = filter_period(store.list_sessions(game=model.GARDEN_GAME, user_id=user.user_id, limit=MAX_ROUNDS), since)
-        pages = build_report(documents, user.username, now, period)
-        out = args.out or DEFAULT_REPORT_DIR / default_filename(user.username, now)
+        if args.game == "quiz":
+            from app import quiz_report  # Imported here because quiz_report builds on this module.
+            from shared.protocol import QUIZ_GAME
+            game, build, filename = QUIZ_GAME, quiz_report.build_report, quiz_report.default_filename
+        else:
+            game, build, filename = model.GARDEN_GAME, build_report, default_filename
+        documents = filter_period(store.list_sessions(game=game, user_id=user.user_id, limit=MAX_ROUNDS), since)
+        pages = build(documents, user.username, now, period)
+        out = args.out or DEFAULT_REPORT_DIR / filename(user.username, now)
         out = out if out.is_absolute() else Path.cwd() / out
         write_pdf(pages, out)
         LOGGER.info("Report saved for %s: %d round(s), %d page(s), %s", user.username, len(documents), len(pages), out)

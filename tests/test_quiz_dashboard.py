@@ -93,6 +93,14 @@ class ModelTests(unittest.TestCase):
         perfect = model.category_scores([document(ALL_RIGHT)] * 2)
         self.assertIsNone(model.weakest(perfect))
 
+    def test_practice_topics_are_weakest_first_and_can_be_limited(self) -> None:
+        wrong_twice = [document((("wrong", 1), ("wrong", 1), ("right", 1), ("right", 1), ("right", 1)))] * 2
+        scores = model.category_scores(wrong_twice)
+        # Both are 0 of 2, so the tie is broken by name, which keeps the order the same on every run.
+        self.assertEqual(["phone_scam", "sms_phishing"], [s.category for s in model.practice_topics(scores)])
+        self.assertEqual(["phone_scam"], [s.category for s in model.practice_topics(scores, limit=1)])
+        self.assertEqual([], model.practice_topics(scores, minimum_asked=3))
+
     def test_trend_is_oldest_first(self) -> None:
         late = document(ALL_RIGHT, endedAt=1770000900000)
         early = document((("wrong", 1),) * 5, endedAt=1770000100000)
@@ -178,15 +186,12 @@ class QuizTabTests(WindowTestCase):
         self.assertEqual(2, len(panel.figure.axes))
         self.assertEqual(0, panel.pages.currentIndex())
 
-    def test_the_report_button_is_off_on_the_quiz_tab(self) -> None:
+    def test_the_report_button_works_on_both_tabs(self) -> None:
         window = self.window(self.alice)
-        self.assertTrue(window.export_button.isEnabled())
         window.tabs.setCurrentIndex(1)
-        self.assertFalse(window.export_button.isEnabled())
-        self.assertIn("not available yet", window.export_button.toolTip())
+        self.assertTrue(window.export_button.isEnabled())
         window.tabs.setCurrentIndex(0)
         self.assertTrue(window.export_button.isEnabled())
-        self.assertEqual("", window.export_button.toolTip())
 
     def test_the_garden_report_still_works_with_quiz_rounds_stored(self) -> None:
         self.store.save(make_result(endedAt=1770000300000), self.alice.user_id)

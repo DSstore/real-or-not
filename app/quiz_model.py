@@ -144,13 +144,20 @@ def category_scores(documents: list[dict]) -> list[CategoryScore]:
     return sorted(scores, key=lambda s: (s.accuracy, -s.asked, s.category))
 
 
-def weakest(scores: list[CategoryScore], minimum_asked: int = 2) -> CategoryScore | None:
-    """The topic to practise next: the lowest accuracy among topics asked at least ``minimum_asked`` times.
+def practice_topics(scores: list[CategoryScore], minimum_asked: int = 2, limit: int | None = None) -> list[CategoryScore]:
+    """The topics to practise, weakest first: asked at least ``minimum_asked`` times with at least one mistake.
 
     One unlucky question is not a weakness, so a topic needs a couple of answers before it is named. A topic
-    answered perfectly is not a weakness either, so a pure-100% history has none."""
-    candidates = [s for s in scores if s.asked >= minimum_asked and s.correct < s.asked]
-    return candidates[0] if candidates else None  # `scores` is already weakest first
+    answered perfectly is not a weakness either, so a pure-100% history has none. ``scores`` must already be
+    weakest first, as ``category_scores`` returns it."""
+    topics = [s for s in scores if s.asked >= minimum_asked and s.correct < s.asked]
+    return topics if limit is None else topics[:limit]
+
+
+def weakest(scores: list[CategoryScore], minimum_asked: int = 2) -> CategoryScore | None:
+    """The single topic to practise next, or None."""
+    topics = practice_topics(scores, minimum_asked, limit=1)
+    return topics[0] if topics else None
 
 
 def table_row(document: dict) -> list[str]:
@@ -167,4 +174,5 @@ def table_row(document: dict) -> list[str]:
 
 
 __all__ = ["CATEGORY_LABELS", "CategoryScore", "NO_VALUE", "QUIZ_GAME", "Summary", "TABLE_HEADERS", "Trend",
-           "accuracy_of", "category_label", "category_scores", "summarize", "table_row", "trend", "weakest"]
+           "accuracy_of", "category_label", "category_scores", "practice_topics", "summarize", "table_row", "trend",
+           "weakest"]

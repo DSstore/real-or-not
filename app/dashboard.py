@@ -17,6 +17,7 @@ from PyQt6.QtWidgets import (QApplication, QDialog, QFileDialog, QMessageBox, QF
                              QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
 
 from app import dashboard_model as model
+from app import quiz_report
 from app.quiz_panel import QuizPanel
 from app.report import DEFAULT_REPORT_DIR, MAX_ROUNDS, ReportError, build_report, default_filename, write_pdf
 from backend.auth import AuthError, User, UserStore
@@ -192,7 +193,6 @@ class DashboardWindow(QMainWindow):
 
         self.refresh_button.clicked.connect(self.refresh)
         self.export_button.clicked.connect(self._choose_and_export)
-        self.tabs.currentChanged.connect(self._tab_changed)
         self.logout_button.clicked.connect(self._log_out)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.refresh)
@@ -200,25 +200,27 @@ class DashboardWindow(QMainWindow):
             self.timer.start(refresh_ms)
         self.refresh()
 
-    def _tab_changed(self, index: int) -> None:
-        """The PDF report covers Reach Garden only, so the button is off on the Scam Quiz tab."""
-        on_garden = index == 0
-        self.export_button.setEnabled(on_garden)
-        self.export_button.setToolTip("" if on_garden else "Progress reports for the Scam Quiz are not available yet.")
-
     def _choose_and_export(self) -> None:
         now = datetime.now()
         DEFAULT_REPORT_DIR.mkdir(parents=True, exist_ok=True)
-        suggestion = str(DEFAULT_REPORT_DIR / default_filename(self._user.username, now))
+        filename = quiz_report.default_filename if self._on_quiz_tab() else default_filename
+        suggestion = str(DEFAULT_REPORT_DIR / filename(self._user.username, now))
         chosen, _filter = QFileDialog.getSaveFileName(self, "Save progress report", suggestion, "PDF files (*.pdf)")
         if chosen:  # An empty string means the player cancelled.
             self.export_report(Path(chosen))
 
-    def export_report(self, path: Path) -> bool:
-        """Write this player's progress report as a PDF. Returns whether it worked; the status line says why not."""
+    def _on_quiz_tab(self) -> bool:
+        return self.tabs.currentWidget() is self.quiz_panel
+
+    def export_report(self, path: Path, quiz: bool | None = None) -> bool:
+        """Write this player's progress report as a PDF, for the game on the current tab unless ``quiz`` says which.
+
+        Returns whether it worked; the status line says why not."""
+        quiz = self._on_quiz_tab() if quiz is None else quiz
+        game, build = (QUIZ_GAME, quiz_report.build_report) if quiz else (model.GARDEN_GAME, build_report)
         try:
-            documents = self._store.list_sessions(game=model.GARDEN_GAME, user_id=self._user.user_id, limit=MAX_ROUNDS)
-            pages = build_report(documents, self._user.username, datetime.now())
+            documents = self._store.list_sessions(game=game, user_id=self._user.user_id, limit=MAX_ROUNDS)
+            pages = build(documents, self._user.username, datetime.now())
             write_pdf(pages, path)
         except (ReportError, StorageError) as error:
             LOGGER.warning("Report not saved for %s: %s", self._user.username, error)
