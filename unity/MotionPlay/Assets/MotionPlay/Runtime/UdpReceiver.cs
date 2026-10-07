@@ -19,8 +19,18 @@ namespace MotionPlay.Unity
         private long appliedSequence = -1;
         private double lastSummary;
 
-        public ReceiverSnapshot Snapshot { get; private set; }
+        private readonly ReceiverSnapshot[] snapshots = new ReceiverSnapshot[CvState.MaxSlots];
+
+        /// <summary>Player 0, which is the only player in single-player games.</summary>
+        public ReceiverSnapshot Snapshot => snapshots[0];
         public CvState CurrentState => Snapshot?.State;
+
+        /// <summary>The latest state of one player (0 or 1); null before the first read or while stopped.</summary>
+        public ReceiverSnapshot GetSnapshot(int slot)
+        {
+            if (slot < 0 || slot >= snapshots.Length) throw new ArgumentOutOfRangeException(nameof(slot));
+            return snapshots[slot];
+        }
         public string Status => status;
         public double LastApplyDelayMs { get; private set; }
 
@@ -74,7 +84,7 @@ namespace MotionPlay.Unity
         private void Update()
         {
             if (listener == null) return;
-            Snapshot = listener.Read();
+            for (int slot = 0; slot < snapshots.Length; slot++) snapshots[slot] = listener.Read(slot);
             if (!listener.IsRunning)
             {
                 string error = listener.LastError ?? "UDP listener stopped.";
@@ -113,7 +123,7 @@ namespace MotionPlay.Unity
                 listener = null;
                 Debug.Log("MotionPlay Unity receiver stopped; socket released.", this);
             }
-            Snapshot = null;
+            for (int slot = 0; slot < snapshots.Length; slot++) snapshots[slot] = null;
             wasTracking = false;
             appliedStream = null;
             appliedSequence = -1;

@@ -59,8 +59,18 @@ namespace MotionPlay.Networking
                     }
                     else if (positionToken.Type != JTokenType.Null || gesture != "UNKNOWN" || confidence != 0)
                         return false;
+                    // Optional: only two-player streams carry a slot. An explicit null counts as absent.
+                    int? slot = null;
+                    JToken slotToken = root["slot"];
+                    if (slotToken != null && slotToken.Type != JTokenType.Null)
+                    {
+                        if (slotToken.Type != JTokenType.Integer) return false;
+                        long slotValue = slotToken.Value<long>();
+                        if (slotValue < 0 || slotValue >= CvState.MaxSlots) return false;
+                        slot = (int)slotValue;
+                    }
                     state = new CvState(stream, sequence, timestamp, hand, tracking, position,
-                                        gesture, confidence, mirrored);
+                                        gesture, confidence, mirrored, slot);
                     return true;
                 }
             }

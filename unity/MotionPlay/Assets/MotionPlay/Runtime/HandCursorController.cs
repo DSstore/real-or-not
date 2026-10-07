@@ -1,5 +1,6 @@
 using System;
 using MotionPlay.Control;
+using MotionPlay.Networking;
 using UnityEngine;
 
 namespace MotionPlay.Unity
@@ -11,6 +12,8 @@ namespace MotionPlay.Unity
     {
         [SerializeField] private UdpReceiver receiver;
         [SerializeField] private Camera gameplayCamera;
+        [SerializeField, Range(0, CvState.MaxSlots - 1), Tooltip("Which player's hand drives this cursor: 0, or 1 in a two-player game.")]
+        private int slot;
         [SerializeField, Tooltip("Desired final horizontal orientation. Python's mirror flag prevents a second flip.")]
         private bool mirrorControl = true;
         [SerializeField, Min(0.001f)] private float cursorRadius = 0.12f;
@@ -25,11 +28,14 @@ namespace MotionPlay.Unity
         public string CurrentHand { get; private set; }
         public string Status { get; private set; } = "Waiting for tracking";
         public bool MirrorControl => mirrorControl;
+        /// <summary>The player (0 or 1) whose hand drives this cursor.</summary>
+        public int Slot => slot;
 
         /// <summary>Wire scene references before Play; serialized so the setup survives scene reloads.</summary>
-        public void Configure(UdpReceiver source, Camera view)
+        public void Configure(UdpReceiver source, Camera view, int playerSlot = 0)
         {
-            receiver = source; gameplayCamera = view; lastError = null;
+            if (playerSlot < 0 || playerSlot >= CvState.MaxSlots) throw new ArgumentOutOfRangeException(nameof(playerSlot));
+            receiver = source; gameplayCamera = view; slot = playerSlot; lastError = null;
         }
 
         private void Awake()
@@ -47,8 +53,8 @@ namespace MotionPlay.Unity
         private void Update()
         {
             if (!TryView(out CursorArea area)) return;
-            if (!CursorMapper.TryMap(receiver.isActiveAndEnabled ? receiver.Snapshot : null,
-                area, mirrorControl, out CursorPoint point))
+            ReceiverSnapshot snapshot = receiver.isActiveAndEnabled ? receiver.GetSnapshot(slot) : null;
+            if (!CursorMapper.TryMap(snapshot, area, mirrorControl, out CursorPoint point))
             {
                 Hide("Hand unavailable — cursor hidden");
                 return;
@@ -64,7 +70,7 @@ namespace MotionPlay.Unity
             transform.localScale = Vector3.one * (2 * cursorRadius);
             CurrentPosition = position;
             visual.enabled = true;
-            CurrentHand = receiver.CurrentState.Hand;
+            CurrentHand = snapshot.State.Hand;
             Status = "Tracking " + CurrentHand;
         }
 

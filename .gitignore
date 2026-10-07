@@ -57,3 +57,7 @@ reports/
 
 # Standalone Windows player built by scripts/build-player.ps1
 unity/MotionPlay/Builds/
+
+# Copy of data/questions.json made for the Unity player before every build (the repository file is the source)
+unity/MotionPlay/Assets/StreamingAssets/
+unity/MotionPlay/Assets/StreamingAssets.meta

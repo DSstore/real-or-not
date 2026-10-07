@@ -227,8 +227,9 @@ Measured on the development PC and webcam (640x480, light model), two people sid
   differ), hands crossing the centre line (the closest approach was about 20% of the picture width), and larger
   distances. Zones do not depend on the label, and the line margin (`CONTROL_ZONE_HYSTERESIS`) is unproven in use.
 
-The Python side is built (`cv_engine/zones.py`, the `slot` field, one stream per player) and unit-tested. It has not yet
-been run with two people on the real camera.
+The Python side is built (`cv_engine/zones.py`, the `slot` field, one stream per player), unit-tested, and has been run
+with two people on the real camera (about 26 to 27 fps with the 2-hand limit). The Unity receiver now keeps one buffer per
+`slot`, and `tests/check_python_unity_udp.py` sends two players' synthetic hands over real sockets to the C# receiver.
 
 ## Still open
 

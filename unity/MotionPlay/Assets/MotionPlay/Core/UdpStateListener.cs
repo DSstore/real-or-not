@@ -6,12 +6,17 @@ using System.Threading;
 
 namespace MotionPlay.Networking
 {
-    /// <summary>Socket worker with no Unity calls; snapshots are the only data handoff.</summary>
+    /// <summary>
+    /// Socket worker with no Unity calls; snapshots are the only data handoff. Keeps one buffer per player (slot),
+    /// each with its own stream and ordering rules, so two players' streams never compete. A packet without a slot
+    /// (the original single-player stream) goes to slot 0, and <see cref="Read()"/> reads slot 0, so single-player
+    /// code is unchanged.
+    /// </summary>
     public sealed class UdpStateListener : IDisposable
     {
         private readonly ReceiverConfiguration configuration;
         private readonly object lifecycle = new object();
-        private CvStateBuffer buffer;
+        private CvStateBuffer[] buffers;
         private Socket socket;
         private Thread worker;
         private volatile bool running;
@@ -24,7 +29,14 @@ namespace MotionPlay.Networking
         public UdpStateListener(ReceiverConfiguration configuration)
         {
             this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-            buffer = new CvStateBuffer(configuration.TimeoutSeconds);
+            buffers = NewBuffers();
+        }
+
+        private CvStateBuffer[] NewBuffers()
+        {
+            var created = new CvStateBuffer[CvState.MaxSlots];
+            for (int slot = 0; slot < created.Length; slot++) created[slot] = new CvStateBuffer(configuration.TimeoutSeconds);
+            return created;
         }
 
         public void Start()
@@ -39,12 +51,12 @@ namespace MotionPlay.Networking
                     nextSocket.ExclusiveAddressUse = true;
                     nextSocket.ReceiveTimeout = 100;
                     nextSocket.Bind(new IPEndPoint(IPAddress.Loopback, configuration.Port));
-                    buffer = new CvStateBuffer(configuration.TimeoutSeconds);
+                    buffers = NewBuffers();
                     Volatile.Write(ref lastError, null);
                     socket = nextSocket;
                     running = true;
-                    CvStateBuffer nextBuffer = buffer;
-                    worker = new Thread(() => ReceiveLoop(nextSocket, nextBuffer))
+                    CvStateBuffer[] nextBuffers = buffers;
+                    worker = new Thread(() => ReceiveLoop(nextSocket, nextBuffers))
                     { IsBackground = true, Name = "MotionPlay UDP receive" };
                     worker.Start();
                 }
@@ -59,9 +71,23 @@ namespace MotionPlay.Networking
             }
         }
 
-        public ReceiverSnapshot Read() => buffer.Read(MonotonicSeconds);
+        /// <summary>The latest state of player 0, which is the whole story for a single-player stream.</summary>
+        public ReceiverSnapshot Read() => Read(0);
 
-        private void ReceiveLoop(Socket ownedSocket, CvStateBuffer ownedBuffer)
+        /// <summary>The latest state of one player (0 or 1). A player who never sent has no state.</summary>
+        public ReceiverSnapshot Read(int slot)
+        {
+            if (slot < 0 || slot >= CvState.MaxSlots) throw new ArgumentOutOfRangeException(nameof(slot));
+            return buffers[slot].Read(MonotonicSeconds);
+        }
+
+        private static void RecordInvalid(CvStateBuffer[] ownedBuffers)
+        {
+            // Not attributable to a player, so every player's snapshot shows it.
+            foreach (CvStateBuffer each in ownedBuffers) each.RecordInvalid();
+        }
+
+        private void ReceiveLoop(Socket ownedSocket, CvStateBuffer[] ownedBuffers)
         {
             var bytes = new byte[CvStateCodec.MaxDatagramBytes + 1];
             EndPoint source = new IPEndPoint(IPAddress.Any, 0);
@@ -74,12 +100,12 @@ namespace MotionPlay.Networking
                     catch (SocketException error) when (error.SocketErrorCode == SocketError.TimedOut ||
                         error.SocketErrorCode == SocketError.WouldBlock) { continue; }
                     catch (SocketException error) when (error.SocketErrorCode == SocketError.MessageSize)
-                    { ownedBuffer.RecordInvalid(); continue; }
+                    { RecordInvalid(ownedBuffers); continue; }
                     if (!running) break;
                     if (!(source is IPEndPoint sender) || !IPAddress.IsLoopback(sender.Address) ||
                         !CvStateCodec.TryDecode(bytes, count, out CvState state))
-                    { ownedBuffer.RecordInvalid(); continue; }
-                    ownedBuffer.TryAccept(state, MonotonicSeconds);
+                    { RecordInvalid(ownedBuffers); continue; }
+                    ownedBuffers[state.Slot ?? 0].TryAccept(state, MonotonicSeconds);
                 }
             }
             // A worker boundary must report failures to the owner, rather than
@@ -91,7 +117,7 @@ namespace MotionPlay.Networking
             finally
             {
                 running = false;
-                ownedBuffer.ClearState();
+                ClearAll(ownedBuffers);
                 ownedSocket.Dispose();
             }
         }
@@ -107,12 +133,17 @@ namespace MotionPlay.Networking
                 if (worker != null && !worker.Join(1000))
                 {
                     Volatile.Write(ref lastError, "UDP worker did not stop within one second; restart Play Mode before rebinding.");
-                    buffer.ClearState();
+                    ClearAll(buffers);
                     return;
                 }
                 worker = null;
-                buffer.ClearState();
+                ClearAll(buffers);
             }
+        }
+
+        private static void ClearAll(CvStateBuffer[] all)
+        {
+            foreach (CvStateBuffer each in all) each.ClearState();
         }
 
         public void Dispose() => Stop();

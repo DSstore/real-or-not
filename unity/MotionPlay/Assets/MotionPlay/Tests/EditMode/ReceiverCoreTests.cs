@@ -137,6 +137,34 @@ namespace MotionPlay.Tests
             Reject(Encoding.UTF8.GetBytes(valid.Replace("\"hand\"", "'hand'")));
         }
 
+        [Test]
+        public void ASlotIsOptionalAndMustBeAPlayerNumber()
+        {
+            Assert.IsNull(PacketFixture.State().Slot); // the original single-player packet has no slot
+            foreach (int slot in new[] { 0, 1 })
+            {
+                var json = PacketFixture.Json(); json["slot"] = slot;
+                byte[] bytes = PacketFixture.Bytes(json);
+                Assert.IsTrue(CvStateCodec.TryDecode(bytes, bytes.Length, out CvState state));
+                Assert.AreEqual(slot, state.Slot);
+            }
+            var explicitNull = PacketFixture.Json(); explicitNull["slot"] = JValue.CreateNull();
+            byte[] nullBytes = PacketFixture.Bytes(explicitNull);
+            Assert.IsTrue(CvStateCodec.TryDecode(nullBytes, nullBytes.Length, out CvState nullState));
+            Assert.IsNull(nullState.Slot);
+        }
+
+        [TestCase("2")]
+        [TestCase("-1")]
+        [TestCase("1.5")]
+        [TestCase("true")]
+        [TestCase("\"0\"")]
+        public void InvalidSlotsAreRejected(string value)
+        {
+            var json = PacketFixture.Json(); json["slot"] = JToken.Parse(value);
+            Reject(PacketFixture.Bytes(json));
+        }
+
         private static void Reject(byte[] bytes)
         {
             Assert.IsFalse(CvStateCodec.TryDecode(bytes, bytes.Length, out CvState state));
@@ -273,6 +301,58 @@ namespace MotionPlay.Tests
                 Send(sender, port, PacketFixture.Json(0, PacketFixture.StreamB));
                 Assert.IsTrue(SpinWait.SpinUntil(() => listener.Read().Accepted == 1, 2000));
                 Assert.AreEqual(PacketFixture.StreamB, listener.Read().State.StreamId);
+            }
+        }
+
+        [Test]
+        public void EachPlayerHasTheirOwnStreamAndSlotlessPacketsGoToPlayerZero()
+        {
+            int port = FreePort();
+            using (var listener = new UdpStateListener(new ReceiverConfiguration(port, 5)))
+            using (var sender = new UdpClient())
+            {
+                listener.Start();
+                var first = PacketFixture.Json(0, PacketFixture.StreamA); first["slot"] = 0;
+                var second = PacketFixture.Json(0, PacketFixture.StreamB); second["slot"] = 1;
+                second["position"]["x"] = 0.8;
+                Send(sender, port, first);
+                Send(sender, port, second); // a different stream, but a different player: not refused
+                Assert.IsTrue(SpinWait.SpinUntil(() => listener.Read(0).Accepted == 1 && listener.Read(1).Accepted == 1, 2000));
+                Assert.AreEqual(PacketFixture.StreamA, listener.Read(0).State.StreamId);
+                Assert.AreEqual(PacketFixture.StreamB, listener.Read(1).State.StreamId);
+                Assert.AreEqual(0.55, listener.Read(0).State.Position.X);
+                Assert.AreEqual(0.8, listener.Read(1).State.Position.X);
+                Assert.AreEqual(0, listener.Read(0).Rejected + listener.Read(1).Rejected);
+                Assert.AreEqual(0, listener.Read().State.Slot); // Read() is player 0
+
+                // Player 1 losing tracking does not touch player 0.
+                var lost = PacketFixture.Json(1, PacketFixture.StreamB, tracking: false); lost["slot"] = 1;
+                Send(sender, port, lost);
+                Assert.IsTrue(SpinWait.SpinUntil(() => !listener.Read(1).Tracking, 2000));
+                Assert.IsTrue(listener.Read(0).Tracking);
+
+                // The original single-player packet (no slot) is player 0's.
+                Send(sender, port, PacketFixture.Json(1, PacketFixture.StreamA));
+                Assert.IsTrue(SpinWait.SpinUntil(() => listener.Read(0).Accepted == 2, 2000));
+                Assert.IsNull(listener.Read(0).State.Slot);
+                Assert.AreEqual(2, listener.Read(0).Accepted);
+                Assert.AreEqual(2, listener.Read(1).Accepted);
+                Assert.Throws<ArgumentOutOfRangeException>(() => listener.Read(2));
+                Assert.Throws<ArgumentOutOfRangeException>(() => listener.Read(-1));
+            }
+        }
+
+        [Test]
+        public void MalformedPacketsAreCountedForBothPlayers()
+        {
+            int port = FreePort();
+            using (var listener = new UdpStateListener(new ReceiverConfiguration(port, 5)))
+            using (var sender = new UdpClient())
+            {
+                listener.Start();
+                byte[] invalid = Encoding.UTF8.GetBytes("invalid");
+                sender.Send(invalid, invalid.Length, "127.0.0.1", port);
+                Assert.IsTrue(SpinWait.SpinUntil(() => listener.Read(0).Invalid == 1 && listener.Read(1).Invalid == 1, 2000));
             }
         }
 

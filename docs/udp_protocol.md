@@ -81,8 +81,9 @@ the rules above to each separately. Hands are matched to players by where they a
 MediaPipe's left/right label, so two people can both show a right hand. In this mode `hand` is only the name of the
 player's zone (`left` for slot 0, `right` for slot 1) and says nothing about which hand the person used, and `x` is
 stretched so the middle of the player's half covers the whole 0 to 1 range (see `CONTROL_ZONE_EDGE_TRIM`). The Unity
-build from Phase 6 keeps a single buffer and accepts only one `stream_id` at a time, so it cannot be used with two
-players; it needs a per-`slot` receiver.
+receiver (`UdpStateListener`) keeps one buffer per `slot`, each with its own stream and ordering rules, so the two
+players' streams never compete. A packet without a `slot` goes to player 0 and `Read()` reads player 0, so one-player
+code is unchanged; two-player code reads `Read(slot)`.
 
 Only the selected hand controls this stream. There is no automatic fallback to
 the other hand, even when both are tracked. Separate filter/gesture states remain

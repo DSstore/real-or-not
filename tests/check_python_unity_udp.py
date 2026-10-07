@@ -88,6 +88,69 @@ def check_pipeline(dotnet: str, assembly: Path) -> None:
         stop_probe(process)
 
 
+def start_slot_probe(dotnet: str, assembly: Path) -> tuple[subprocess.Popen[str], int]:
+    """Like start_probe, for the two-player probe that reports each packet's player."""
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as probe:
+        probe.bind(("127.0.0.1", 0))
+        port = probe.getsockname()[1]
+    process = subprocess.Popen([dotnet, str(assembly), "--probe-slots", str(port)],
+                               stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    assert process.stdout is not None
+    if process.stdout.readline().strip() != "READY":
+        process.kill()
+        _output, errors = process.communicate()
+        raise RuntimeError(f"C# listener did not start: {errors}")
+    return process, port
+
+
+def check_two_players(dotnet: str, assembly: Path) -> None:
+    """Two people who both show a right hand, through the zones and two senders, to the real C# receiver."""
+    from dataclasses import replace
+
+    from cv_engine.models import Landmark, TrackedHand
+    from cv_engine.zones import ZONE_LABELS, ZoneAssigner
+
+    def hand(x: float) -> TrackedHand:
+        return TrackedHand("right", 0.95, (Landmark(x, 0.5, -0.02),) * 21)
+
+    control_settings = ControlSettings(smoothing_alpha=1, dead_zone=0)
+    zones, positions = ZoneAssigner(2, control_settings), PositionProcessor(control_settings)
+    controls = positions.update(zones.assign(TrackingResult((hand(0.1), hand(0.9)), 1), 0.0), 0.0)
+    outgoing = zones.output_controls(controls)
+    process, port = start_slot_probe(dotnet, assembly)
+    assert process.stdout is not None
+    try:
+        senders = [UdpSender("127.0.0.1", port, replace(SenderSettings(), hand=ZONE_LABELS[slot]), True, slot=slot)
+                   for slot in range(2)]
+        with senders[0], senders[1]:
+            for sender in senders:
+                assert sender.send(outgoing, GestureResult(), 0)
+            received = {}
+            for _ in range(2):
+                line = json.loads(process.stdout.readline())
+                received[line["slot"]] = line
+            assert sorted(received) == [0, 1]
+            for slot, expected_x in ((0, (0.2 - 0.15) / 0.7), (1, (0.8 - 0.15) / 0.7)):
+                line = received[slot]
+                assert line["packet_slot"] == slot and line["tracking"] is True
+                assert line["stream_id"] == senders[slot].stream_id and line["sequence"] == 0
+                assert line["hand"] == ZONE_LABELS[slot]
+                assert math.isclose(line["position"]["x"], expected_x, abs_tol=1e-12), line
+                assert math.isclose(line["cursor"]["x"], (2 * expected_x - 1) * 3.8, abs_tol=1e-12), line
+            assert received[0]["stream_id"] != received[1]["stream_id"]
+            # Player 2 loses their hand; player 1 is unaffected.
+            lost_controls = positions.update(zones.assign(TrackingResult((hand(0.1),), 1), 0.04), 0.04)
+            assert senders[1].send(zones.output_controls(lost_controls), GestureResult(), 0.04)
+            lost = json.loads(process.stdout.readline())
+            assert lost["slot"] == 1 and lost["tracking"] is False and lost["position"] is None
+        tail, errors = process.communicate(timeout=12)
+        assert process.returncode == 0, errors
+        assert "TIMEOUT" in tail
+        print("PASS two players (both 'right' hands) -> zones -> two UDP streams -> C# per-player state; one lost hand is independent")
+    finally:
+        stop_probe(process)
+
+
 def check_silence_timeout(dotnet: str, assembly: Path) -> None:
     """Closing a raw sender sends no terminal packet; C# must clear by timeout."""
     process, port = start_probe(dotnet, assembly)
@@ -116,6 +179,7 @@ def main() -> int:
     if not args.assembly.is_file():
         parser.error("Build the C# harness first; see docs/phase6_unity_receiver.md.")
     check_pipeline(args.dotnet, args.assembly)
+    check_two_players(args.dotnet, args.assembly)
     check_silence_timeout(args.dotnet, args.assembly)
     return 0
 
