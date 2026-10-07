@@ -69,11 +69,25 @@ questions are spread over different topics where possible.
 
 The copy in `Assets/StreamingAssets` is made before every build and is not committed; `data/questions.json` is the source.
 
+## Saving results
+
+When a round ends, each player's result is sent to the Python result receiver, which stores it once and acknowledges it
+(the summary shows "Saving results...", then "Results saved", or says if the receiver is not running). Each player has
+their own result, all sharing one round id. Start the receiver before playing:
+
+```powershell
+.\.venv\Scripts\python.exe -m backend.result_receiver --store sqlite --user alice --user2 bob
+```
+
+Player 1 (the left half) is saved to `--user` and player 2 to `--user2`; leave one out and that player is saved without an
+owner. Each stored round keeps, for every question, the choice made, the time taken and (looked up from the question
+bank) its category, difficulty and right answer. The message and storage are described in
+[the protocol](udp_protocol.md#scam-quiz-results). `backend.sessions list --game scam_quiz` shows them.
+
 ## Not done yet
 
-- **Results are not saved.** The statistics and a per-question response log are recorded in memory (`ScamQuizStats`), but
-  nothing is sent: the Python receiver does not yet know the `QUIZ_SESSION_END` message in
-  [the protocol design](quiz_phase0_protocol_design.md), and the dashboard and reports are still Reach Garden only.
-- Both players currently share one result per round on screen only; one saved result per player, linked by a round id, is
-  part of the same later step.
+- **No dashboard or report for the quiz.** The dashboard and PDF reports still show Reach Garden rounds only (they now
+  ask for that game by name, so quiz rounds in the same database do not disturb them).
+- **`MotionPlay-Start.cmd` and `start.ps1` start the receiver for one player.** Start the receiver by hand with `--user2`
+  for two players.
 - Nobody has looked at the layout in Unity yet (question and answer text sizes, the spacing of the panels).

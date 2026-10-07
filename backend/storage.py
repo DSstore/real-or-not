@@ -1,9 +1,11 @@
 """Session storage behind one interface; callers never know which backend they have.
 
 Every store keeps one document per finished round, keyed by ``session_id``. Documents are plain
-dicts holding the validated SESSION_END fields (see ``SessionEnd.to_document``) plus ``user_id``,
-the player the round belongs to (null if no one was logged in). Metrics with no samples are
-stored as null, never zero.
+dicts holding the validated SESSION_END fields (see ``SessionEnd.to_document``) or, for the scam quiz,
+the QUIZ_SESSION_END fields (``QuizSessionEnd.to_document``), plus ``user_id``, the player the round
+belongs to (null if no one was logged in). Metrics with no samples are stored as null, never zero.
+The two games never share a document shape, so callers that read one game's rounds must ask for it with
+``game=`` rather than assume every stored round looks like a Reach Garden round.
 """
 
 from __future__ import annotations
@@ -14,10 +16,21 @@ import sqlite3
 from pathlib import Path
 from typing import Protocol
 
-from shared.protocol import SessionEnd
+from shared.protocol import QuizSessionEnd, SessionEnd
 
 STORE_KINDS = ("jsonl", "sqlite", "mongo")
 _FIELDS = tuple(SessionEnd.__dataclass_fields__)
+StoredResult = SessionEnd | QuizSessionEnd
+# Scam quiz rounds live in their own SQLite table, so a database made before the quiz existed needs no migration.
+_QUIZ_COLUMNS = (
+    ("session_id", "TEXT PRIMARY KEY"), ("stream_id", "TEXT"), ("sequence", "INTEGER"), ("timestamp", "INTEGER"),
+    ("game", "TEXT"), ("hand", "TEXT"), ("difficulty", "TEXT"), ("startedAt", "INTEGER"), ("endedAt", "INTEGER"),
+    ("duration", "REAL"), ("roundId", "TEXT"), ("slot", "INTEGER"), ("bankVersion", "INTEGER"),
+    ("totalQuestions", "INTEGER"), ("correct", "INTEGER"), ("wrong", "INTEGER"), ("skipped", "INTEGER"),
+    ("bestStreak", "INTEGER"), ("averageResponseTime", "REAL"), ("fastestResponse", "REAL"),
+    ("slowestResponse", "REAL"), ("responses", "TEXT NOT NULL"),
+)
+_QUIZ_NAMES = tuple(name for name, _ in _QUIZ_COLUMNS) + ("user_id",)
 _NEWEST_FIRST = lambda document: (document["endedAt"], document["session_id"])  # noqa: E731
 
 
@@ -26,7 +39,7 @@ class StorageError(RuntimeError):
 
 
 class ResultStore(Protocol):
-    def save(self, result: SessionEnd, user_id: str | None = None) -> bool:
+    def save(self, result: StoredResult, user_id: str | None = None) -> bool:
         """Persist the result for ``user_id``. Return True if newly stored, False if the session_id
         already existed (the first owner is kept)."""
 
@@ -69,7 +82,7 @@ class JsonlResultStore:
         except OSError as error:
             raise StorageError(f"Cannot prepare results file: {error.strerror or error}") from error
 
-    def save(self, result: SessionEnd, user_id: str | None = None) -> bool:
+    def save(self, result: StoredResult, user_id: str | None = None) -> bool:
         if result.session_id in self._documents:
             return False
         document = {**result.to_document(), "user_id": user_id}
@@ -157,14 +170,23 @@ class SqliteResultStore:
                 self._db.execute("ALTER TABLE sessions ADD COLUMN user_id TEXT")
             self._db.execute("CREATE INDEX IF NOT EXISTS sessions_ended ON sessions (endedAt DESC)")
             self._db.execute("CREATE INDEX IF NOT EXISTS sessions_user ON sessions (user_id)")
+            quiz = ", ".join(f"{name} {kind}" for name, kind in _QUIZ_COLUMNS) + ", user_id TEXT"
+            self._db.execute(f"CREATE TABLE IF NOT EXISTS quiz_sessions ({quiz})")
+            self._db.execute("CREATE INDEX IF NOT EXISTS quiz_sessions_ended ON quiz_sessions (endedAt DESC)")
+            self._db.execute("CREATE INDEX IF NOT EXISTS quiz_sessions_user ON quiz_sessions (user_id)")
+            self._db.execute("CREATE INDEX IF NOT EXISTS quiz_sessions_round ON quiz_sessions (roundId)")
             self._db.commit()
         except (OSError, sqlite3.Error) as error:
             raise StorageError(f"Cannot open the SQLite database: {error}") from error
 
-    def save(self, result: SessionEnd, user_id: str | None = None) -> bool:
+    def save(self, result: StoredResult, user_id: str | None = None) -> bool:
         document = {**result.to_document(), "user_id": user_id}
-        names = (*_FIELDS, "user_id")
-        sql = (f"INSERT OR IGNORE INTO sessions ({', '.join(names)}) "
+        if isinstance(result, QuizSessionEnd):
+            table, names = "quiz_sessions", _QUIZ_NAMES
+            document["responses"] = json.dumps(document["responses"], separators=(",", ":"), allow_nan=False)
+        else:
+            table, names = "sessions", (*_FIELDS, "user_id")
+        sql = (f"INSERT OR IGNORE INTO {table} ({', '.join(names)}) "
                f"VALUES ({', '.join('?' for _ in names)})")
         try:
             with self._db:
@@ -173,12 +195,21 @@ class SqliteResultStore:
             raise StorageError(f"SQLite write failed: {error}") from error
         return cursor.rowcount == 1
 
+    @staticmethod
+    def _quiz_document(row: sqlite3.Row) -> dict:
+        document = dict(row)
+        document["responses"] = json.loads(document["responses"])
+        return document
+
     def get(self, session_id: str) -> dict | None:
         try:
             row = self._db.execute("SELECT * FROM sessions WHERE session_id = ?", (session_id,)).fetchone()
+            if row is not None:
+                return dict(row)
+            row = self._db.execute("SELECT * FROM quiz_sessions WHERE session_id = ?", (session_id,)).fetchone()
         except sqlite3.Error as error:
             raise StorageError(f"SQLite read failed: {error}") from error
-        return dict(row) if row is not None else None
+        return self._quiz_document(row) if row is not None else None
 
     @staticmethod
     def _where(game: str | None, user_id: str | None) -> tuple[str, list]:
@@ -196,25 +227,30 @@ class SqliteResultStore:
         _check_limit(limit)
         where, args = self._where(game, user_id)
         try:
-            rows = self._db.execute(
+            garden = [dict(row) for row in self._db.execute(
                 f"SELECT * FROM sessions {where} ORDER BY endedAt DESC, session_id DESC LIMIT ?",
-                [*args, limit]).fetchall()
+                [*args, limit]).fetchall()]
+            quiz = [self._quiz_document(row) for row in self._db.execute(
+                f"SELECT * FROM quiz_sessions {where} ORDER BY endedAt DESC, session_id DESC LIMIT ?",
+                [*args, limit]).fetchall()]
         except sqlite3.Error as error:
             raise StorageError(f"SQLite read failed: {error}") from error
-        return [dict(row) for row in rows]
+        # Each table gave its newest ``limit``, so the newest ``limit`` of the two together are among them.
+        return sorted(garden + quiz, key=_NEWEST_FIRST, reverse=True)[:limit]
 
     def count(self, *, game: str | None = None, user_id: str | None = None) -> int:
         where, args = self._where(game, user_id)
         try:
-            return self._db.execute(f"SELECT COUNT(*) FROM sessions {where}", args).fetchone()[0]
+            return sum(self._db.execute(f"SELECT COUNT(*) FROM {table} {where}", args).fetchone()[0]
+                       for table in ("sessions", "quiz_sessions"))
         except sqlite3.Error as error:
             raise StorageError(f"SQLite read failed: {error}") from error
 
     def claim_unassigned(self, user_id: str) -> int:
         try:
             with self._db:
-                return self._db.execute("UPDATE sessions SET user_id = ? WHERE user_id IS NULL",
-                                        (user_id,)).rowcount
+                return sum(self._db.execute(f"UPDATE {table} SET user_id = ? WHERE user_id IS NULL",
+                                            (user_id,)).rowcount for table in ("sessions", "quiz_sessions"))
         except sqlite3.Error as error:
             raise StorageError(f"SQLite write failed: {error}") from error
 
@@ -241,7 +277,7 @@ class MongoResultStore:
         except Exception as error:  # pymongo raises several unrelated connection errors
             raise StorageError("Cannot reach MongoDB; check MONGODB_URI and that the server is running.") from error
 
-    def save(self, result: SessionEnd, user_id: str | None = None) -> bool:
+    def save(self, result: StoredResult, user_id: str | None = None) -> bool:
         from pymongo.errors import DuplicateKeyError, PyMongoError
         try:
             self._collection.insert_one({**result.to_document(), "user_id": user_id})

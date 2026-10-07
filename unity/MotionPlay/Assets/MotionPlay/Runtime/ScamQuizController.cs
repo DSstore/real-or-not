@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using MotionPlay.Games;
+using MotionPlay.Networking;
 using UnityEngine;
 
 namespace MotionPlay.Unity
@@ -60,6 +61,10 @@ namespace MotionPlay.Unity
         private string loadError;
         private string levelNotice;
         private QuizPhase lastPhase = QuizPhase.Waiting;
+        private ResultSender sender;
+        private string roundId, roundLevelLabel;
+        private long roundStartedAt;
+        private readonly string[] lastHand = new string[CvStateSlots];
         private readonly QuizInput[] inputs = new QuizInput[CvStateSlots];
         private readonly bool[] tracked = new bool[CvStateSlots];
         private bool anyTracked;
@@ -97,6 +102,8 @@ namespace MotionPlay.Unity
         private void Awake()
         {
             BuildVisuals();
+            sender = GetComponent<ResultSender>();
+            if (sender == null) sender = gameObject.AddComponent<ResultSender>();
             try
             {
                 bank = QuestionBankLoader.Load(questionFileOverride);
@@ -191,6 +198,7 @@ namespace MotionPlay.Unity
                 if (!cursor.isActiveAndEnabled || !cursor.IsTracking) continue;
                 tracked[i] = true;
                 anyTracked = true;
+                if (cursor.CurrentHand != null) lastHand[i] = cursor.CurrentHand;
                 Vector3 local = gameplayCamera.transform.InverseTransformPoint(cursor.CurrentPosition.Value);
                 inputs[i] = new QuizInput(true, HitPanel(local.x, local.y));
             }
@@ -212,12 +220,53 @@ namespace MotionPlay.Unity
         private void TrackPhase()
         {
             QuizPhase phase = game.Phase;
+            if (phase == QuizPhase.Asking && (lastPhase == QuizPhase.Waiting || lastPhase == QuizPhase.Complete)) BeginRound();
             if (phase == QuizPhase.Complete && lastPhase != QuizPhase.Complete) AfterRound();
             lastPhase = phase;
         }
 
+        /// <summary>A round has started: one id shared by the players, when it began, and the level it is played at.</summary>
+        private void BeginRound()
+        {
+            roundId = Guid.NewGuid().ToString("D");
+            roundStartedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            roundLevelLabel = ScamQuizDifficulty.LabelFor(game.Level); // before the level can adapt to this round
+            for (int i = 0; i < lastHand.Length; i++) lastHand[i] = null;
+        }
+
+        /// <summary>Send each player's own result, all with this round's id. They are queued and sent one after another.</summary>
+        private void SubmitResults()
+        {
+            if (roundId == null) return;
+            long ended = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            for (int i = 0; i < players; i++)
+            {
+                if (!game.Players[i].Active) continue;
+                ScamQuizStats stats = game.Stats(i);
+                if (stats.Total == 0) continue;
+                // In a two-player game the "hand" is the player's zone, so fall back to it if no hand was ever read.
+                string hand = lastHand[i] ?? (i == 0 ? "left" : "right");
+                sender.Submit(QuizSessionResult.FromStats(stats, i, hand, roundLevelLabel, Guid.NewGuid().ToString("D"),
+                    roundId, bank.Version, roundStartedAt, ended));
+            }
+        }
+
+        private string DeliveryText()
+        {
+            if (sender == null || sender.Error != null) return "Results not sent";
+            switch (sender.State)
+            {
+                case DeliveryState.Sending: return "Saving results...";
+                case DeliveryState.Confirmed: return sender.Pending == 0 ? "Results saved" : "Saving results...";
+                case DeliveryState.Rejected: return "Results rejected";
+                case DeliveryState.NotConfirmed: return "Results NOT saved. Is the result receiver running?";
+                default: return "Results not sent";
+            }
+        }
+
         private void AfterRound()
         {
+            SubmitResults();
             recent.Add(game.AskedQuestionIds);
             try { PlayerPrefs.SetString(RecentPrefsKey, recent.Serialize()); PlayerPrefs.Save(); }
             catch (Exception issue) { Debug.LogWarning("MotionPlay: could not save recent questions: " + issue.Message, this); }
@@ -581,7 +630,7 @@ namespace MotionPlay.Unity
             Text(Inset(cardRect, 0.35f, 0.25f), text.ToString(), medium, TextAnchor.MiddleLeft, FontStyle.Bold, Ink, 22);
             Text(buttonRect, "Play again", big, TextAnchor.MiddleCenter, FontStyle.Bold, Ink);
             Text(Box(buttonRect.xMin - 2.5f, buttonRect.yMin - 0.55f, buttonRect.xMax + 2.5f, buttonRect.yMin - 0.05f),
-                 "Hold your cursor on the button, or press R.   Results are not saved yet.", small, TextAnchor.UpperCenter, FontStyle.Normal, Outline);
+                 "Hold your cursor on the button, or press R.   " + DeliveryText(), small, TextAnchor.UpperCenter, FontStyle.Normal, Outline);
         }
 
         private static string Encouragement(double score)

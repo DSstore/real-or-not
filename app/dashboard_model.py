@@ -12,6 +12,9 @@ from datetime import datetime
 from typing import Iterable
 
 NO_VALUE = "-"
+# These views understand only Reach Garden rounds. The store also keeps scam quiz rounds, whose documents have a
+# different shape, so every read for these views must ask for this game by name.
+GARDEN_GAME = "reach_garden"
 
 
 def _mean(values: Iterable[float | None]) -> float | None:

@@ -151,6 +151,43 @@ def check_two_players(dotnet: str, assembly: Path) -> None:
         stop_probe(process)
 
 
+def check_quiz_results_reach_the_store(dotnet: str, assembly: Path) -> None:
+    """C# plays a whole round from the shipped question file; Python receives, checks and stores both results."""
+    import tempfile
+
+    from backend.result_receiver import ResultReceiver
+    from backend.storage import SqliteResultStore
+    from shared.protocol import decode_quiz_session_end, encode_result_ack
+    from shared.questions import load_bank
+
+    completed = subprocess.run([dotnet, str(assembly), "--emit-quiz-result", str(ROOT / "data" / "questions.json")],
+                               capture_output=True, text=True, timeout=120)
+    assert completed.returncode == 0, completed.stderr
+    lines = [line for line in completed.stdout.splitlines() if line.startswith("{")]
+    assert len(lines) == 2, completed.stdout
+    results = [decode_quiz_session_end(line.encode("utf-8")) for line in lines]
+    assert [r.slot for r in results] == [0, 1]
+    assert results[0].roundId == results[1].roundId and results[0].session_id != results[1].session_id
+    assert all(r.game == "scam_quiz" and r.totalQuestions == 5 and r.difficulty == "level_2" for r in results)
+    bank = load_bank()
+    with tempfile.TemporaryDirectory() as folder:
+        store = SqliteResultStore(Path(folder) / "m.db")
+        try:
+            receiver = ResultReceiver(store, "user-one", second_user_id="user-two", bank=bank)
+            for line, result in zip(lines, results):
+                assert receiver.handle(line.encode("utf-8")) == encode_result_ack(result.session_id, "stored")
+            first, second = (store.get(r.session_id) for r in results)
+            assert (first["user_id"], second["user_id"]) == ("user-one", "user-two")
+            for document in (first, second):
+                assert all(row["category"] is not None for row in document["responses"]), document["responses"]
+                # What C# counted as right is what the question bank says was right.
+                assert sum(1 for row in document["responses"] if row["is_correct"]) == document["correct"]
+            assert first["correct"] == 5 and second["correct"] == 3 and second["wrong"] == 2
+        finally:
+            store.close()
+    print("PASS C# plays a round from data/questions.json -> QUIZ_SESSION_END x2 -> Python receiver -> stored per player with categories")
+
+
 def check_silence_timeout(dotnet: str, assembly: Path) -> None:
     """Closing a raw sender sends no terminal packet; C# must clear by timeout."""
     process, port = start_probe(dotnet, assembly)
@@ -180,6 +217,7 @@ def main() -> int:
         parser.error("Build the C# harness first; see docs/phase6_unity_receiver.md.")
     check_pipeline(args.dotnet, args.assembly)
     check_two_players(args.dotnet, args.assembly)
+    check_quiz_results_reach_the_store(args.dotnet, args.assembly)
     check_silence_timeout(args.dotnet, args.assembly)
     return 0
 

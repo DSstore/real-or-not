@@ -202,6 +202,52 @@ Metric definitions are in [Phase 9](phase9_session_stats.md). `GAME_STATE` and
 }
 ```
 
+### Scam quiz results
+
+The scam quiz sends **one `QUIZ_SESSION_END` per player** when a round ends, so a two-player round is two datagrams
+that share a `roundId`. It uses the same transport rules, the same `RESULT_ACK` reply and the same retry behaviour as
+`SESSION_END`; the receiver tells the two apart by `type`. Every field is required, and unknown extra fields are ignored.
+
+| Field | Type | Rule |
+|---|---|---|
+| `type`, `version` | string, int | `"QUIZ_SESSION_END"`, `1` |
+| `stream_id`, `session_id`, `roundId` | string | Canonical UUIDs. `session_id` is this player's result (repeats are harmless); `roundId` is shared by the players of one round |
+| `sequence`, `timestamp` | int | Nonnegative; timestamp is UTC milliseconds |
+| `game` | string | `scam_quiz` |
+| `difficulty` | string | `level_1` to `level_5`, the shared level the round was played at |
+| `hand` | string | `left` or `right`. In a two-player game this is the player's zone, not necessarily the hand they used |
+| `slot` | int | The player, `0` or `1` |
+| `startedAt`, `endedAt`, `duration` | int, int, number | UTC milliseconds, `endedAt` not before `startedAt`; seconds, at least 0 |
+| `bankVersion` | int | At least 1: the `version` of the question bank the round was played with |
+| `totalQuestions` | int | 1 to 20, and equal to the number of `responses` |
+| `correct`, `wrong`, `skipped`, `bestStreak` | int | `correct + wrong + skipped = totalQuestions`; `skipped` is the number of timeouts in `responses`; `correct + wrong` the number of answers; `bestStreak` ≤ `correct` |
+| `averageResponseTime`, `fastestResponse`, `slowestResponse` | number or null | Seconds of tracked time. `null` exactly when nothing was answered, never zero; otherwise they must match the response log to within 2 ms |
+| `responses` | list | One `[question_id, selected, response_ms]` per question, in the order asked |
+
+In `responses`, `question_id` is the bank's id (lowercase letters, digits, `-` and `_`, up to 64 characters, no repeats),
+`selected` is the index into the question's **written** choices (0 to 3, not the position on screen) or `-1` if time
+ran out, and `response_ms` is whole milliseconds of tracked time, `null` exactly when `selected` is `-1`.
+
+The category, difficulty and right answer of each question are **not sent**. The receiver looks them up in the question
+bank (`data/questions.json`, or `--questions`) and stores them with each response, so a stored round is self-contained.
+Which answers were right is only known with the bank, so a mismatch between `correct` and the answers is logged as a
+warning, not rejected. A question the bank does not know, or a round played with a different `bankVersion`, is still
+stored (a known id is trusted, since ids are never reused), with empty details for the unknown ones and a warning.
+
+```json
+{"type":"QUIZ_SESSION_END","version":1,"stream_id":"b2e222b2-2222-4222-8222-222222222222","sequence":0,
+ "timestamp":1770000091000,"session_id":"e5e555e5-5555-4555-8555-555555555555","game":"scam_quiz","hand":"left",
+ "difficulty":"level_2","startedAt":1770000000000,"endedAt":1770000090000,"duration":90.0,
+ "roundId":"d4e444d4-4444-4444-8444-444444444444","slot":0,"bankVersion":2,"totalQuestions":5,"correct":3,
+ "wrong":1,"skipped":1,"bestStreak":2,"averageResponseTime":5.7,"fastestResponse":3.0,"slowestResponse":9.1,
+ "responses":[["sms-01",1,4200],["phone-01",2,9100],["otp-01",-1,null],["social-01",3,3000],["love-01",0,6500]]}
+```
+
+A five-question round is about 700 bytes and a twenty-question round about 1,000, both under the 1,200 limit.
+Run the receiver for two players with `python -m backend.result_receiver --store sqlite --user NAME --user2 NAME`:
+player 1 (`slot` 0) is saved to `--user`, player 2 (`slot` 1) to `--user2`, and a player without an account is saved
+without an owner (claimable later with `backend.sessions claim`).
+
 The reply is `{"type":"RESULT_ACK","version":1,"session_id":"…","status":"…"}`:
 
 | Status | Meaning | Unity |

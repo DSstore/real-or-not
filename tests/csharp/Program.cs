@@ -1,8 +1,12 @@
 using System;
 using System.Diagnostics;
+using System.IO;
+using System.Text;
 using System.Threading;
 using MotionPlay.Control;
+using MotionPlay.Games;
 using MotionPlay.Networking;
+using MotionPlay.Tests;
 using Newtonsoft.Json.Linq;
 using NUnitLite;
 
@@ -12,6 +16,7 @@ internal static class Program
     private static int Main(string[] args)
     {
         if (args.Length == 2 && args[0] == "--probe-slots") return ProbeSlots(int.Parse(args[1]));
+        if (args.Length == 2 && args[0] == "--emit-quiz-result") return EmitQuizResult(args[1]);
         if (args.Length != 2 || args[0] != "--probe") return new AutoRun().Execute(args);
         using (var listener = new UdpStateListener(new ReceiverConfiguration(int.Parse(args[1]))))
         {
@@ -49,6 +54,28 @@ internal static class Program
             }
             return 1;
         }
+    }
+
+    /// <summary>
+    /// Plays a whole two-player round from the given question file with the real game code, then prints each player's
+    /// QUIZ_SESSION_END as the Unity quiz would send it, so Python can check what it would receive.
+    /// </summary>
+    private static int EmitQuizResult(string questionFile)
+    {
+        QuestionBank bank = QuestionBank.Parse(File.ReadAllText(questionFile));
+        var game = new ScamQuizGame(bank, ScamQuizDifficulty.SettingsFor(2), 3);
+        game.Step(QuizDriver.Frame, QuizDriver.Hands(true, true));
+        QuizDriver.PlayRound(game, q => true, q => q % 2 == 0, think: 1); // player 1 always right, player 2 on every other
+        string round = Guid.NewGuid().ToString("D"), stream = Guid.NewGuid().ToString("D");
+        for (int slot = 0; slot < 2; slot++)
+        {
+            QuizSessionResult result = QuizSessionResult.FromStats(game.Stats(slot), slot, slot == 0 ? "left" : "right",
+                ScamQuizDifficulty.LabelFor(game.Level), Guid.NewGuid().ToString("D"), round, bank.Version,
+                1770000000000, 1770000090000);
+            result.StreamId = stream; result.Sequence = slot; result.Timestamp = 1770000091000;
+            Console.WriteLine(Encoding.UTF8.GetString(QuizSessionResultCodec.Encode(result)));
+        }
+        return 0;
     }
 
     /// <summary>Two-player probe: prints each accepted packet with the player it belongs to.</summary>

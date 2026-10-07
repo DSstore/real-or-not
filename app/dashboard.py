@@ -199,7 +199,7 @@ class DashboardWindow(QMainWindow):
     def export_report(self, path: Path) -> bool:
         """Write this player's progress report as a PDF. Returns whether it worked; the status line says why not."""
         try:
-            documents = self._store.list_sessions(user_id=self._user.user_id, limit=MAX_ROUNDS)
+            documents = self._store.list_sessions(game=model.GARDEN_GAME, user_id=self._user.user_id, limit=MAX_ROUNDS)
             pages = build_report(documents, self._user.username, datetime.now())
             write_pdf(pages, path)
         except (ReportError, StorageError) as error:
@@ -220,7 +220,7 @@ class DashboardWindow(QMainWindow):
 
     def refresh(self) -> None:
         try:
-            documents = self._store.list_sessions(user_id=self._user.user_id, limit=ROUND_LIMIT)
+            documents = self._store.list_sessions(game=model.GARDEN_GAME, user_id=self._user.user_id, limit=ROUND_LIMIT)
         except StorageError as error:
             LOGGER.warning("Could not read rounds for %s: %s", self._user.username, error)
             self.status_label.setText(f"Could not read rounds: {error}")

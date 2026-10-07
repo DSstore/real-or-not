@@ -38,7 +38,7 @@ only has to pass it.
 | Store | Pick it when |
 |---|---|
 | `jsonl` | Simplest; easy to read and diff. Loads everything into memory, so it suits small histories. |
-| `sqlite` | A real database with an index on `endedAt`, no server to install. Good default for a single player machine. |
+| `sqlite` | A real database with an index on `endedAt`, no server to install. Good default for a single player machine. Reach Garden rounds are in the `sessions` table and scam quiz rounds in `quiz_sessions` (created on first use, so an older database needs no migration); the store reads and writes both. |
 | `mongo` | You already run MongoDB. Uses `MONGODB_URI` and `MONGODB_DATABASE` from `.env`; collection `sessions` with a unique index on `session_id` and an index on `endedAt`. |
 
 ## Commands (Windows 11, PowerShell)

@@ -269,7 +269,7 @@ def main(argv: list[str] | None = None, *, prompt: Prompt = getpass.getpass, now
         start_logging(settings, "report", console=False)
         user = log_in(args.user, args.users_db, prompt, **auth_options)
         store = store_from_args(args.store, args.file, settings)
-        documents = filter_period(store.list_sessions(user_id=user.user_id, limit=MAX_ROUNDS), since)
+        documents = filter_period(store.list_sessions(game=model.GARDEN_GAME, user_id=user.user_id, limit=MAX_ROUNDS), since)
         pages = build_report(documents, user.username, now, period)
         out = args.out or DEFAULT_REPORT_DIR / default_filename(user.username, now)
         out = out if out.is_absolute() else Path.cwd() / out

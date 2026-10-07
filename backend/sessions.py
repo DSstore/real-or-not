@@ -14,7 +14,7 @@ from backend.result_receiver import add_store_arguments, store_from_args
 from backend.storage import ResultStore, StorageError
 from backend.users import Prompt, add_user_arguments, log_in, open_users
 from shared.config import PROJECT_ROOT, ConfigurationError, load_settings
-from shared.protocol import ProtocolError, decode_session_end
+from shared.protocol import QUIZ_GAME, ProtocolError, QuizSessionEnd, decode_session_end
 
 
 def _percent(value: float | None) -> str:
@@ -29,6 +29,11 @@ def format_row(document: dict, names: dict[str, str] | None = None) -> str:
     """One readable line; missing metrics show as '-', never as zero. ``names`` maps user ids to usernames."""
     ended = datetime.fromtimestamp(document["endedAt"] / 1000, tz=timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
     player = (names or {}).get(document.get("user_id"), "-")
+    if document.get("game") == QUIZ_GAME:
+        return (f"{ended}  {player:<12} {document['game']:<13} {document['hand']:<5} "
+                f"{document['correct']}/{document['totalQuestions']} right  "
+                f"avg {_seconds(document['averageResponseTime']):>7}  best run {document['bestStreak']}  "
+                f"{document['difficulty']}  player {document['slot'] + 1}  {document['session_id']}")
     return (f"{ended}  {player:<12} {document['game']:<13} {document['hand']:<5} "
             f"{document['targetsCompleted']}/{document['targetsAttempted']} watered  "
             f"acc {_percent(document['accuracy']):>4}  react {_seconds(document['averageReactionTime']):>7}  "
@@ -47,7 +52,10 @@ def import_jsonl(path: Path, store: ResultStore, user_id: str | None = None) -> 
                 continue
             try:
                 data = json.loads(line)
-                result = decode_session_end(json.dumps({"type": "SESSION_END", "version": 1, **data}).encode("utf-8"))
+                if isinstance(data, dict) and data.get("game") == QUIZ_GAME:
+                    result = QuizSessionEnd.from_document(data)
+                else:
+                    result = decode_session_end(json.dumps({"type": "SESSION_END", "version": 1, **data}).encode("utf-8"))
                 owner = data.get("user_id")
                 if owner is not None and not isinstance(owner, str):
                     raise ProtocolError("user_id must be a string or null.")

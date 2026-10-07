@@ -29,6 +29,8 @@ namespace MotionPlay.Unity
 
         public DeliveryState State => delivery != null ? delivery.State : DeliveryState.Idle;
         public int Attempts => delivery != null ? delivery.CurrentAttempts : 0;
+        /// <summary>Results still waiting to be sent or acknowledged.</summary>
+        public int Pending => delivery != null ? delivery.Pending : 0;
         /// <summary>Why results cannot be sent, or null when the sender is ready.</summary>
         public string Error => error;
 
@@ -42,6 +44,24 @@ namespace MotionPlay.Unity
             try
             {
                 delivery.Submit(result.SessionId, SessionResultCodec.Encode(result), Time.realtimeSinceStartupAsDouble);
+            }
+            catch (Exception problem) when (problem is ArgumentException || problem is InvalidOperationException)
+            {
+                error = "Result could not be encoded: " + problem.Message;
+                Debug.LogError("MotionPlay: " + error, this);
+            }
+        }
+
+        /// <summary>Stamp the envelope and queue one player's quiz result; it is sent, in order, on a later Update.</summary>
+        public void Submit(QuizSessionResult result)
+        {
+            if (delivery == null || result == null) return;
+            result.StreamId = streamId.ToString("D");
+            result.Sequence = sequence++;
+            result.Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            try
+            {
+                delivery.Submit(result.SessionId, QuizSessionResultCodec.Encode(result), Time.realtimeSinceStartupAsDouble);
             }
             catch (Exception problem) when (problem is ArgumentException || problem is InvalidOperationException)
             {
