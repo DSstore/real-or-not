@@ -13,10 +13,11 @@ from pathlib import Path
 
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtWidgets import (QApplication, QDialog, QFileDialog, QMessageBox, QFrame, QGridLayout, QHBoxLayout, QHeaderView,
-                             QLabel, QLineEdit, QMainWindow, QPushButton, QSplitter, QStackedWidget,
+                             QLabel, QLineEdit, QMainWindow, QPushButton, QSplitter, QStackedWidget, QTabWidget,
                              QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget)
 
 from app import dashboard_model as model
+from app.quiz_panel import QuizPanel
 from app.report import DEFAULT_REPORT_DIR, MAX_ROUNDS, ReportError, build_report, default_filename, write_pdf
 from backend.auth import AuthError, User, UserStore
 from backend.result_receiver import add_store_arguments, store_from_args
@@ -24,6 +25,7 @@ from backend.storage import ResultStore, StorageError
 from backend.users import DEFAULT_USERS_DB, open_users
 from shared.config import ConfigurationError, load_settings
 from shared.logger import start_logging
+from shared.protocol import QUIZ_GAME
 
 LOGGER = logging.getLogger("motionplay.app.dashboard")
 
@@ -111,7 +113,7 @@ class LoginDialog(QDialog):
 
 
 class DashboardWindow(QMainWindow):
-    """One player's rounds. Reads only that player's rounds from the store."""
+    """One player's rounds, on a tab per game. Reads only that player's rounds from the store."""
 
     CARD_TITLES = ["Rounds", "Accuracy", "Best streak", "Reaction", "Hold stability", "Path efficiency"]
 
@@ -170,23 +172,39 @@ class DashboardWindow(QMainWindow):
         self.pages.addWidget(splitter)
         self.pages.addWidget(self.empty_label)
 
+        garden_tab = QWidget()
+        garden_layout = QVBoxLayout(garden_tab)
+        garden_layout.setContentsMargins(0, 0, 0, 0)
+        garden_layout.addLayout(cards)
+        garden_layout.addWidget(self.pages, 1)
+        self.quiz_panel = QuizPanel(user.username)
+        self.tabs = QTabWidget()
+        self.tabs.addTab(garden_tab, "Reach Garden")
+        self.tabs.addTab(self.quiz_panel, "Scam Quiz")
+
         self.status_label = QLabel("")
         root = QWidget()
         layout = QVBoxLayout(root)
         layout.addLayout(header)
-        layout.addLayout(cards)
-        layout.addWidget(self.pages, 1)
+        layout.addWidget(self.tabs, 1)
         layout.addWidget(self.status_label)
         self.setCentralWidget(root)
 
         self.refresh_button.clicked.connect(self.refresh)
         self.export_button.clicked.connect(self._choose_and_export)
+        self.tabs.currentChanged.connect(self._tab_changed)
         self.logout_button.clicked.connect(self._log_out)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.refresh)
         if refresh_ms > 0:
             self.timer.start(refresh_ms)
         self.refresh()
+
+    def _tab_changed(self, index: int) -> None:
+        """The PDF report covers Reach Garden only, so the button is off on the Scam Quiz tab."""
+        on_garden = index == 0
+        self.export_button.setEnabled(on_garden)
+        self.export_button.setToolTip("" if on_garden else "Progress reports for the Scam Quiz are not available yet.")
 
     def _choose_and_export(self) -> None:
         now = datetime.now()
@@ -221,6 +239,7 @@ class DashboardWindow(QMainWindow):
     def refresh(self) -> None:
         try:
             documents = self._store.list_sessions(game=model.GARDEN_GAME, user_id=self._user.user_id, limit=ROUND_LIMIT)
+            quiz_documents = self._store.list_sessions(game=QUIZ_GAME, user_id=self._user.user_id, limit=ROUND_LIMIT)
         except StorageError as error:
             LOGGER.warning("Could not read rounds for %s: %s", self._user.username, error)
             self.status_label.setText(f"Could not read rounds: {error}")
@@ -241,9 +260,11 @@ class DashboardWindow(QMainWindow):
                 self.table.setItem(row, column, item)
         self._draw_trend(documents)
         self.pages.setCurrentIndex(0 if documents else 1)
+        self.quiz_panel.show_rounds(quiz_documents)
         shown = f"showing the {len(documents)} most recent" if len(documents) == ROUND_LIMIT else f"{len(documents)} round(s)"
-        self.status_label.setText(f"Updated {datetime.now().strftime('%H:%M:%S')} - {shown}. "
-                                  f"Total play time {model.duration(summary.total_seconds)}.")
+        self.status_label.setText(f"Updated {datetime.now().strftime('%H:%M:%S')} - Reach Garden: {shown}, "
+                                  f"play time {model.duration(summary.total_seconds)}; "
+                                  f"Scam Quiz: {len(quiz_documents)} round(s).")
 
     def _draw_trend(self, documents: list[dict]) -> None:
         """Accuracy and reaction time by round, oldest on the left. Rounds with no value leave a gap."""
